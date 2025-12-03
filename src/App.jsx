@@ -7,7 +7,7 @@ import Articles from './pages/Articles.jsx';
 import Contact from './pages/Contact.jsx';
 
 export default function App() {
-  const basename = import.meta.env.BASE_URL || '/';
+  const basename = import.meta.env.BASE_URL || '/personal-site/';
 
   return (
     <BrowserRouter basename={basename}>
