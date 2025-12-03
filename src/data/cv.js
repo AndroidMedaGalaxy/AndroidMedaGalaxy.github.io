@@ -4,8 +4,8 @@ export const profile = {
   location: 'Dublin, Ireland',
   work_permission: "Stamp 4 ",
   linkedin: 'https://www.linkedin.com/in/rituraj-sambherao',
-  summary: `Experienced Android Engineer with 10+ years of building high-quality, scalable mobile applications using Kotlin and Jetpack Compose. Currently leading internationalization efforts at Toast for their global POS platform.`,
-};
+summary: `Senior Android Engineer with 10+ years of experience building fast, reliable, and beautifully crafted mobile apps. I specialise in Kotlin, Jetpack Compose, and modern Android architecture. I love exploring new technologies, experimenting with bold ideas, and solving problems that are anything but boring.`};
+
 
 export const experience = [
   {
@@ -60,11 +60,41 @@ export const experience = [
 ];
 
 export const skills = {
-  mobile: ['Kotlin', 'Jetpack Compose', 'MVVM/MVI', 'Coroutines', 'Navigation', 'Material 3'],
-  ciCd: ['GitHub Actions', 'Jenkins', 'Firebase', 'Testing', 'TDD'],
-  tooling: ['Jira', 'Azure DevOps', 'Confluence', 'Figma'],
-  other: ['Remote collaboration', 'Consultancy experience'],
+  mobile: [
+    'Kotlin',
+    'Jetpack Compose',
+    'MVVM / MVI',
+    'Coroutines + Flow',
+    'Modular Architecture',
+    'Navigation (Compose)',
+    'Room / DataStore',
+    'GraphQL / Retrofit',
+    'Performance Profiling',
+    'Compose UI Testing'
+  ],
+
+  ciCd: [
+    'GitHub Actions',
+    'Gradle Optimization',
+    'Detekt / Ktlint / Spotless',
+    'Automated Testing Pipelines',
+    'Play Store Deployment'
+  ],
+
+  tooling: [
+    'Android Studio Profilers',
+    'Firebase Crashlytics',
+    'Postman / Insomnia',
+    'Figma Collaboration',
+    'ADB & Shell Tools'
+  ],
+
+  other: [
+    'Remote Collaboration',
+    'Cross-functional Communication'
+  ],
 };
+
 
 export const education = [
   {
