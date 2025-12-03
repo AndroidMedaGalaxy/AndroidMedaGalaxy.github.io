@@ -18,7 +18,7 @@ export default function Contact() {
         <p>Location: {profile.location}</p>
         <p>
           LinkedIn:{' '}
-          <a href={profile.linkedin} target="_blank" rel="noreferrer">
+          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">
             {profile.linkedin}
           </a>
         </p>
