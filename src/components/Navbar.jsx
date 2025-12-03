@@ -14,7 +14,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg overflow-hidden border border-slate-600">
             <img
-              src="/personal-site/images/droidmeda_welding.png"
+              src="/images/droidmeda_welding.png"
               alt="DroidMeda"
               className="h-full w-full object-cover object-center"
             />

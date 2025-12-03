@@ -27,7 +27,7 @@ export default function Home() {
         <div className="relative flex items-center justify-center">
           <div className="h-40 w-40 rounded-3xl overflow-hidden border border-slate-700">
             <img
-              src="/personal-site/images/droidmeda_welding.png"
+              src="/images/droidmeda_welding.png"
               alt="DroidMeda Welding"
               className="h-full w-full object-cover object-center"
             />
