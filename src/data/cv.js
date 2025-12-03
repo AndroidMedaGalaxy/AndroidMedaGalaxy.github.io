@@ -3,7 +3,7 @@ export const profile = {
   title: 'Senior Android Engineer',
   location: 'Dublin, Ireland',
   work_permission: "Stamp 4 ",
-  linkedin: 'https://www.linkedin.com/in/rituraj-sambherao',
+  linkedin: 'https://linkedin.com/in/rituraj-sambherao',
 summary: `Senior Android Engineer with 10+ years of experience building fast, reliable, and beautifully crafted mobile apps. I specialise in Kotlin, Jetpack Compose, and modern Android architecture. I love exploring new technologies, experimenting with bold ideas, and solving problems that are anything but boring.`};
 
 

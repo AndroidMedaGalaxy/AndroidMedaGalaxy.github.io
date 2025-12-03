@@ -17,7 +17,9 @@ export default function Home() {
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
             <a
-              href={`mailto:${profile.linkedin}`}
+              href={profile.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-teal-500 px-4 py-2 font-medium text-slate-950 shadow-lg shadow-teal-500/40 hover:bg-teal-400"
             >
               View LinkedIn →
