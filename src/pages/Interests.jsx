@@ -62,7 +62,7 @@ function InterestGallery({images}) {
                         {images.map((_, i) => (
                             <button
                                 key={i}
-                                className={`inline-block w-4 h-4 rounded-full border-2 border-teal-400 ${i === idx ? 'bg-teal-400' : 'bg-slate-900'}`}
+                                className={`inline-block w-3 h-3 rounded-full border border-slate-600 ${i === idx ? 'bg-teal-300/70' : 'bg-slate-500/60'}`}
                                 onClick={() => setIdx(i)}
                                 aria-label={`Go to image ${i + 1}`}
                             />
