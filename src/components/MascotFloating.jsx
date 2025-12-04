@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 
-export default function MascotFloating() {
+export default function MascotFloating({isOnHomePage = false, homeScale = 1.5, homeRight = 0, homeBottom = 0}) {
     const [floatPhase, setFloatPhase] = useState(0);
     const [showBubble, setShowBubble] = useState(false);
     const [entered, setEntered] = useState(false); // for first entrance
@@ -38,23 +38,33 @@ export default function MascotFloating() {
         return () => document.removeEventListener('mousedown', handle);
     }, [showBubble]);
 
-    // Floating up+down independent of scroll
-    const mascotScale = showBubble ? 0.35 : 1.15;
+    // Values for home vs non-home
+    const defaultScale = showBubble ? 0.35 : 1.15;
+    const defaultRight = 40;
+    const defaultBottom = 100 + 60 * Math.sin(floatPhase);
+
+    const scale = isOnHomePage
+        ? homeScale
+        : defaultScale;
+    const right = isOnHomePage
+        ? homeRight
+        : defaultRight;
+    const bottom = isOnHomePage
+        ? homeBottom
+        : defaultBottom;
     // Animate in from top-right using transform and opacity
-    const baseX = 40;
-    const baseY = 100 + 60 * Math.sin(floatPhase);
     const enterX = entered ? 0 : -60;
     const enterY = entered ? 0 : -100;
     const opacity = entered ? 1 : 0;
     const mascotStyle = {
         position: 'fixed',
         zIndex: 1500,
-        right: baseX + enterX,
-        bottom: baseY + enterY,
-        transform: `translateY(${16 * Math.sin(floatPhase * 1.2)}px) scale(${mascotScale})`,
+        right: right + enterX,
+        bottom: bottom + enterY,
+        transform: `translateY(${16 * Math.sin(floatPhase * 1.2)}px) scale(${scale})`,
         cursor: 'pointer',
         opacity,
-        transition: 'transform 0.21s cubic-bezier(.41,1.51,.36,.88), bottom 0.7s cubic-bezier(.45,1.34,.36,.88), right 0.7s cubic-bezier(.45,1.34,.36,.88), opacity 0.4s',
+        transition: 'transform 0.21s cubic-bezier(.41,1.51,.36,.88), bottom 0.72s cubic-bezier(.45,1.34,.36,.88), right 0.72s cubic-bezier(.45,1.34,.36,.88), opacity 0.4s',
     };
 
     return (
