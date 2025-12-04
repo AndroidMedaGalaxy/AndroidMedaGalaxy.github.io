@@ -4,6 +4,45 @@
 
 body {
   @apply bg-slate-950 text-slate-100;
+    position: relative;
+}
+
+/* Celestial star background effect */
+body::before {
+    content: '';
+    position: fixed;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background: /* layer a few different sizes and dispersions */ radial-gradient(1px 1px at 10% 20%, #fff 90%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 70%, #fff 85%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 80% 30%, #fff7 80%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 33% 52%, #fff8 70%, transparent 100%),
+    radial-gradient(0.5px 0.5px at 70% 88%, #fff9 50%, transparent 100%),
+    radial-gradient(0.8px 0.8px at 25% 80%, #fff7 65%, transparent 100%),
+    radial-gradient(0.8px 0.8px at 77% 16%, #fff9 60%, transparent 100%);
+    background-repeat: repeat;
+    background-size: 25vw 25vh;
+    animation: star-twinkle 3s infinite linear alternate;
+}
+
+@keyframes star-twinkle {
+    0%, 100% {
+        opacity: 0.48;
+    }
+    15% {
+        opacity: 0.53;
+    }
+    50% {
+        opacity: 0.60;
+    }
+    85% {
+        opacity: 0.50;
+    }
 }
 
 a {
