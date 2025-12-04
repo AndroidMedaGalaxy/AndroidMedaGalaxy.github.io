@@ -28,18 +28,8 @@ export default function Home() {
           </div>
         </div>
         <div className="relative flex items-center justify-center">
-            <div
-                className="h-40 w-40 flex items-center justify-center bg-transparent">
-                <img
-                    src={`${import.meta.env.BASE_URL}images/droidmeda/mascot_jetpack_flipped_transparent_light.png`}
-                    alt="DroidMeda Mascot"
-                    className="w-[126px] h-[126px] md:w-[158px] md:h-[158px] object-contain animate-none"
-                    style={{
-                        filter: 'drop-shadow(0 2px 7px #24004a70)',
-                        animation: 'mascot-float 3.6s ease-in-out infinite'
-                    }}
-                />
-          </div>
+            <div id="mascot-home-box"
+                 className="h-56 w-56 flex items-center justify-center bg-transparent rounded-3xl overflow-hidden border border-slate-700"></div>
         </div>
       </section>
 
