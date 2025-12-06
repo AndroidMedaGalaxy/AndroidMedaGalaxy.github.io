@@ -19,6 +19,45 @@ function isInScope(query) {
   return allowedDomains.some(keyword => lower.includes(keyword));
 }
 
+// NEW: Helper – detect if a message is basically just a greeting / small talk opener
+function isGreeting(raw) {
+  if (!raw || typeof raw !== 'string') return false;
+  const cleaned = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned) return false;
+
+  const greetingPhrases = [
+    'hi', 'hi there', 'hello', 'hello there', 'hey', 'hey there',
+    'yo', 'hiya', 'howdy',
+    'good morning', 'good afternoon', 'good evening', 'good night',
+    'how are you', 'how are you doing', "how's it going", 'how is it going',
+    "what's up", 'whats up', 'sup'
+  ];
+
+  // Very short messages (1–5 words) that are fully contained in greeting phrases
+  const words = cleaned.split(' ');
+  if (words.length <= 5) {
+    if (greetingPhrases.some(p => p === cleaned)) return true;
+  }
+
+  // If it starts with a greeting phrase and then only light filler
+  const fillerTokens = new Set(['there', 'mate', 'friend', 'buddy', 'man', 'dude']);
+  for (const phrase of greetingPhrases) {
+    if (cleaned.startsWith(phrase)) {
+      const remaining = cleaned.slice(phrase.length).trim();
+      if (!remaining) return true;
+      const remWords = remaining.split(' ');
+      if (remWords.every(w => fillerTokens.has(w))) return true;
+    }
+  }
+
+  return false;
+}
+
 // Helper: Retrieve relevant context server-side
 function retrieveRelevantContext(context, query) {
   if (!context || !Array.isArray(context) || context.length === 0) {
@@ -132,27 +171,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, userMessage } = req.body;
+    const { message, userMessage, userLocalTimeOfDay } = req.body;
     const finalMessage = message || userMessage;
 
     if (!finalMessage || typeof finalMessage !== 'string') {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Check scope server-side
-    if (!isInScope(finalMessage)) {
+    const greeting = isGreeting(finalMessage);
+
+    // Check scope server-side ONLY for non‑greeting messages
+    if (!greeting && !isInScope(finalMessage)) {
       return res.status(200).json({
         reply: "I'm here to answer questions about Rituraj Sambherao's professional work, experience, projects, or articles."
       });
     }
 
-    // Retrieve context SERVER-SIDE using secure context data
-    const contextSnippet = retrieveRelevantContext(contextData, finalMessage);
+    // Retrieve context SERVER-SIDE using secure context data for non‑greeting, in‑scope queries
+    let contextSnippet = '';
+    if (!greeting) {
+      contextSnippet = retrieveRelevantContext(contextData, finalMessage);
 
-    if (!contextSnippet || contextSnippet.length < 10) {
-      return res.status(200).json({
-        reply: "I can only answer questions related to Rituraj Sambherao's experience, projects, and articles."
-      });
+      if (!contextSnippet || contextSnippet.length < 10) {
+        return res.status(200).json({
+          reply: "I can only answer questions related to Rituraj Sambherao's experience, projects, and articles."
+        });
+      }
     }
 
     // Get OpenAI API key from environment variable
@@ -162,19 +206,33 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // System prompt
-      const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. You may use up to 2 appropriate, friendly, or professional emojis per response (ideally to add a dash of visual clarity or personality), but never add more than 2, and it's fine to use none. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
+    // UPDATED System prompt
+      const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. If a user greets you (says hi, hello, hey, or similar), respond in a friendly and polite manner as the assistant, and you may comment briefly on the weather (for their likely location or time of day) but only sometimes, not every time, to keep things personable and varied. You may use up to 2 appropriate, friendly, or professional emojis per response (ideally to add a dash of visual clarity or personality), but never add more than 2, and it's fine to use none. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
 
-    // Prepare OpenAI payload
+    // Build messages payload differently for greeting vs non‑greeting
+    const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+    if (greeting) {
+      // Optionally pass a hint about local time of day if provided
+      if (userLocalTimeOfDay && typeof userLocalTimeOfDay === 'string') {
+        messages.push({
+          role: 'user',
+          content: `User local time of day: ${userLocalTimeOfDay}. Use this only to slightly tailor your greeting.`
+        });
+      }
+      messages.push({ role: 'user', content: finalMessage });
+    } else {
+      messages.push(
+        { role: 'user', content: `Context:\n${contextSnippet}` },
+        { role: 'user', content: finalMessage }
+      );
+    }
+
     const chatPayload = {
       model: 'gpt-4o-mini',
-      messages: [
-        {role: 'system', content: SYSTEM_PROMPT},
-        {role: 'user', content: `Context:\n${contextSnippet}`},
-        {role: 'user', content: finalMessage}
-      ],
+      messages,
       max_tokens: 380,
-      temperature: 0.7,
+      temperature: greeting ? 0.8 : 0.7,
     };
 
     // Call OpenAI API
@@ -203,4 +261,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
-

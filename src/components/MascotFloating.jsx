@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 // Mascot image path
 const mascotImg = import.meta.env.BASE_URL + 'images/droidmeda/mascot_jetpack_flipped_transparent_light.png';
 // User image path (add your preferred user/avatar image to public/images/user.png)
-const userImg = import.meta.env.BASE_URL + 'images/user.png';
+// const userImg = import.meta.env.BASE_URL + 'images/user.png';
 
 // Helper to preserve multiple newlines as visible space
 function MarkdownWithSpacing({children}) {
@@ -34,7 +34,7 @@ function ChatBubble({role, text, timestamp, type, file}) {
                 <p className="mb-2 text-white font-semibold">{text}</p>
                 <a
                     href={file}
-                    download="Rituraj-Sambherao-CV.pdf"
+                    download="Rituraj_Sambherao_CV.pdf"
                     className="download-btn px-4 py-2 rounded-full bg-black/80 text-white font-semibold border border-cyan-400 shadow-lg hover:bg-cyan-700 hover:text-white transition drop-shadow"
                 >
                     Download CV
@@ -65,8 +65,19 @@ function ChatBubble({role, text, timestamp, type, file}) {
                 )}
             </div>
             {isUser && (
-                <img src={userImg} alt="User"
-                     className="w-8 h-8 rounded-full shadow-lg bg-slate-900 border-2 border-cyan-400 ml-2 flex-shrink-0"/>
+                <span
+                    className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-neon-blue shadow-[0_0_14px_#22d3ee,0_0_16px_#0ea5e9] ml-2 bg-black/60 flex-shrink-0">
+                    {/* 8-bit or emoji face SVG */}
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                        <circle cx="13" cy="13" r="12" fill="#293347" stroke="#22d3ee" strokeWidth="1.5"/>
+                        <ellipse cx="9.5" cy="10.6" rx="1" ry="1.5" fill="#fff"/>
+                        <ellipse cx="16.5" cy="10.6" rx="1" ry="1.5" fill="#fff"/>
+                        <ellipse cx="9.5" cy="10.8" rx=".45" ry=".6" fill="#1e293b"/>
+                        <ellipse cx="16.5" cy="10.8" rx=".45" ry=".6" fill="#1e293b"/>
+                        <path d="M9.8 16c.7 1.2 5.7 1.2 6.4 0" stroke="#27e2ea" strokeWidth="1.1"
+                              strokeLinecap="round"/>
+                    </svg>
+                </span>
             )}
         </motion.div>
     );
@@ -102,6 +113,19 @@ export default function MascotFloating() {
     const [activeSuggestions, setActiveSuggestions] = useState([
         ...getSuggestedQueries(),
     ]);
+    // Shooting star arc state
+    const [showArc, setShowArc] = useState(true);
+    useEffect(() => {
+        // Hide arc after animation or when user opens chat
+        if (!open && showArc) {
+            const timeout = setTimeout(() => {
+                setShowArc(false);
+            }, 2300);
+            return () => clearTimeout(timeout);
+        } else if (open) {
+            setShowArc(false);
+        }
+    }, [open, showArc]);
 
     // Load context from /data/context.json once
     useEffect(() => {
@@ -185,21 +209,157 @@ export default function MascotFloating() {
                 {!open && (
                     <motion.button
                         initial={false}
-                        animate={{scale: mascotScale, boxShadow: "0 0 16px #a855f7, 0 0 20px #0ea5e9"}}
-                        whileHover={{scale: 1.14, boxShadow: "0 0 42px #a855f7, 0 0 40px #0ea5e9"}}
+                        animate={{scale: mascotScale, boxShadow: "0 0 18px #22d3ee, 0 0 36px #0ea5e9"}}
+                        whileHover={{scale: 1.14, boxShadow: "0 0 50px #22d3ee, 0 0 56px #0ea5e9"}}
                         exit={{opacity: 0, scale: 0.7, y: 24}}
                         transition={{type: "spring", stiffness: 530, damping: 30}}
-                        className="fixed bottom-24 right-10 z-[51] w-20 h-20 rounded-full shadow-xl border-[2.5px] border-transparent flex items-center justify-center bg-black/20 transition-all"
+                        className="fixed bottom-24 right-10 z-[51] w-20 h-20 rounded-full shadow-xl border-[2.5px] border-transparent flex items-center justify-center bg-black/20 transition-all overflow-visible"
                         style={{pointerEvents: 'auto'}}
                         aria-label={open ? "Hide Chat" : "Open chat"}
                         onClick={() => setOpen(true)}
                     >
+                        {/* Neon pop sparkles background effect (Disney like) */}
+                        {showArc && (
+                            <span
+                                className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none select-none">
+                                <svg
+                                    width="200"
+                                    height="200"
+                                    viewBox="0 0 200 200"
+                                    className="block"
+                                >
+                                    {/* Large main sparkle offset so it peeks around the mascot */}
+                                    <g style={{opacity: 0, animation: 'spark-pop-strong 1.1s 0.15s forwards'}}>
+                                        <polygon
+                                            points="120,40 132,88 180,100 132,112 120,160 108,112 60,100 108,88"
+                                            fill="url(#spark0)"
+                                            filter="url(#sparkGlow0)"
+                                        />
+                                    </g>
+                                    {/* Top-right medium sparkle */}
+                                    <g style={{opacity: 0, animation: 'spark-pop 1s 0.32s forwards'}}>
+                                        <polygon
+                                            points="145,70 149,86 166,92 149,96 145,112 141,96 124,92 141,86"
+                                            fill="url(#spark1)"
+                                            filter="url(#sparkGlow1)"
+                                        />
+                                    </g>
+                                    {/* Top-left medium sparkle */}
+                                    <g style={{opacity: 0, animation: 'spark-pop 0.95s 0.42s forwards'}}>
+                                        <polygon
+                                            points="55,55 58,69 72,73 58,77 55,91 51,77 38,73 51,69"
+                                            fill="url(#spark2)"
+                                            filter="url(#sparkGlow2)"
+                                        />
+                                    </g>
+                                    {/* Lower-right small sparkle */}
+                                    <g style={{opacity: 0, animation: 'spark-pop 0.9s 0.58s forwards'}}>
+                                        <polygon
+                                            points="145,135 147,144 157,148 147,151 145,161 142,151 133,148 142,144"
+                                            fill="url(#spark3)"
+                                            filter="url(#sparkGlow3)"
+                                        />
+                                    </g>
+                                    {/* Lower-left small sparkle */}
+                                    <g style={{opacity: 0, animation: 'spark-pop 0.85s 0.7s forwards'}}>
+                                        <polygon
+                                            points="60,135 62,143 71,146 62,149 60,158 58,149 49,146 58,143"
+                                            fill="url(#spark4)"
+                                            filter="url(#sparkGlow4)"
+                                        />
+                                    </g>
+                                    {/* Tiny center sparkle / flare */}
+                                    <g style={{opacity: 0, animation: 'spark-pop 0.8s 0.82s forwards'}}>
+                                        <polygon
+                                            points="100,35 102,44 111,47 102,50 100,59 98,50 89,47 98,44"
+                                            fill="url(#spark1)"
+                                            filter="url(#sparkGlow1)"
+                                        />
+                                    </g>
+
+                                    <defs>
+                                        <linearGradient id="spark0" x1="80" y1="35" x2="150" y2="165" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#67f9ff"/>
+                                            <stop offset="0.6" stopColor="#22d3ee"/>
+                                            <stop offset="1" stopColor="#0ea5e9"/>
+                                        </linearGradient>
+                                        <linearGradient id="spark1" x1="135" y1="60" x2="175" y2="115" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#38bdf8"/>
+                                            <stop offset="1" stopColor="#0ea5e9"/>
+                                        </linearGradient>
+                                        <linearGradient id="spark2" x1="45" y1="50" x2="78" y2="95" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#22d3ee"/>
+                                            <stop offset="1" stopColor="#21afff"/>
+                                        </linearGradient>
+                                        <linearGradient id="spark3" x1="135" y1="130" x2="165" y2="165" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#67f9ff"/>
+                                            <stop offset="1" stopColor="#0ea5e9"/>
+                                        </linearGradient>
+                                        <linearGradient id="spark4" x1="50" y1="130" x2="75" y2="165" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#0ea5e9"/>
+                                            <stop offset="1" stopColor="#00fff7"/>
+                                        </linearGradient>
+
+                                        <filter id="sparkGlow0" x="40" y="20" width="140" height="160">
+                                            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="sparkGlow1" x="115" y="50" width="80" height="80">
+                                            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="sparkGlow2" x="30" y="45" width="60" height="60">
+                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="sparkGlow3" x="120" y="120" width="60" height="60">
+                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="sparkGlow4" x="40" y="120" width="55" height="55">
+                                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+
+                                    <style>{`
+                                    @keyframes spark-pop {
+                                        0% { opacity: 0; transform: scale(0.5) translate3d(0, 8px, 0); }
+                                        25% { opacity: 0.9; transform: scale(1.1) translate3d(0, 0, 0); }
+                                        70% { opacity: 0.95; transform: scale(1); }
+                                        100% { opacity: 0; transform: scale(1.08) translate3d(0, -4px, 0); }
+                                    }
+                                    @keyframes spark-pop-strong {
+                                        0% { opacity: 0; transform: scale(0.4) translate3d(-4px, 10px, 0); }
+                                        20% { opacity: 1; transform: scale(1.15) translate3d(0, 0, 0); }
+                                        60% { opacity: 1; transform: scale(1); }
+                                        100% { opacity: 0; transform: scale(1.12) translate3d(4px, -6px, 0); }
+                                    }
+                                    `}</style>
+                                </svg>
+                            </span>
+                        )}
                         <img
                             src={mascotImg}
                             alt="DroidMeda Mascot"
                             width={68}
                             height={68}
-                            className="object-contain drop-shadow-xl"
+                            className="object-contain drop-shadow-xl relative z-50"
                             style={{pointerEvents: 'none'}}
                         />
                     </motion.button>
@@ -219,7 +379,7 @@ export default function MascotFloating() {
                     >
                         {/* Mascot + Name in Header */}
                         <div
-                            className="relative h-24 bg-gradient-to-br from-purple-600 via-purple-400 to-cyan-400 rounded-t-[20px] border-b border-white/10 flex items-center px-6"
+                            className="relative h-20 sm:h-24 rounded-t-[18px] sm:rounded-t-[20px] border-b border-white/10 flex items-center px-3 sm:px-6"
                         >
                             <span className="flex items-center gap-4 z-10">
                                 <img
@@ -280,20 +440,30 @@ export default function MascotFloating() {
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     type="text"
-                                    placeholder="Type your message…"
+                                    placeholder={typing ? 'Responding. Please wait…' : 'Type your message…'}
                                     className="flex-grow bg-black/40 border border-transparent rounded-full px-5 py-2 text-white placeholder:text-white/50 outline-none transition focus:border-purple-500 shadow-sm focus:shadow-purple-500/50"
                                     autoFocus={open}
                                     disabled={typing}
                                 />
                                 <button
                                     type="submit"
-                                    className="bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full p-3 text-white text-xl shadow-[0_0_14px_#a855f7] hover:scale-105 transition active:scale-95"
-                                    style={{boxShadow: "0 0 16px 1px #a855f7, 0 0 8px #0ea5e9"}}
+                                    className="rounded-full p-3 text-xl shadow-[0_0_16px_#22d3ee,0_0_32px_#0ea5e9] bg-black/20 border-2 border-cyan-400 transition hover:scale-105 active:scale-95"
+                                    style={{boxShadow: "0 0 22px #22d3ee, 0 0 40px #0ea5e9"}}
                                     aria-label="Send"
                                     disabled={typing}
                                 >
-                                    <svg width="24" height="24" fill="none">
-                                        <path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="#fff" strokeWidth={2}/>
+                                    <svg width="24" height="24" fill="none"
+                                         style={{filter: "drop-shadow(0 0 8px #22d3ee) drop-shadow(0 0 12px #0ea5e9)"}}>
+                                        <path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="url(#neon-linear)"
+                                              strokeWidth={2}/>
+                                        <defs>
+                                            <linearGradient id="neon-linear" x1="4" y1="12" x2="18" y2="5"
+                                                            gradientUnits="userSpaceOnUse">
+                                                <stop stopColor="#22d3ee"/>
+                                                <stop offset="0.55" stopColor="#21afff"/>
+                                                <stop offset="1" stopColor="#0ea5e9"/>
+                                            </linearGradient>
+                                        </defs>
                                     </svg>
                                 </button>
                             </div>

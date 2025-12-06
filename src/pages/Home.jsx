@@ -1,80 +1,264 @@
 import { profile, skills } from '../data/cv';
+import {useEffect, useState} from 'react';
 import MascotFloating from '../components/MascotFloating.jsx';
 
 export default function Home() {
-  return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 pb-12 pt-8">
-      <section className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] md:items-center">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400">
-            Android · Kotlin · Jetpack Compose
-          </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
-            {profile.name}
-          </h1>
-          <p className="mt-1 text-lg text-slate-200">{profile.title}</p>
-          <p className="mt-3 text-sm text-slate-300">
-            {profile.summary}
-          </p>
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg bg-teal-500 px-4 py-2 font-medium text-slate-950 shadow-lg shadow-teal-500/40 hover:bg-teal-400"
-            >
-              View LinkedIn →
-            </a>
-          </div>
-        </div>
-        <div className="relative flex items-center justify-center">
-            <div id="mascot-home-box"
-                 className="h-56 w-56 flex items-center justify-center bg-transparent rounded-3xl overflow-hidden border border-slate-700"></div>
-        </div>
-      </section>
+    // Code journey milestone data (loaded from JSON)
+    const [journeySteps, setJourneySteps] = useState(null);
+    // Default fallback journey in case JSON fetch fails or is missing
+    const fallbackJourney = [
+        '$ starting coding journey…',
+        '$ Learning in school and exploring computers…',
+        '$ Completed undergrad at Pune University',
+        '$ Working in B2B mobile at Nitor',
+        '$ Pursuing MSc at UCD in Dublin',
+        '$ Joined SAP, work on Corona-Warn-App',
+        '$ Built Digital Aged Care project',
+        '$ Joined Mastercard, fintech SDKs',
+        '$ Engineered Gateway SDK',
+        '$ Joined Toast',
+        '$ Leading Toast POS internationalization 🚀',
+        '$ Kotlin/Compose focus ✓'
+    ];
+    useEffect(() => {
+        fetch('/data/journey.json')
+            .then(r => {
+                if (!r.ok) throw new Error();
+                return r.json();
+            })
+            .then(setJourneySteps)
+            .catch(() => {
+                setJourneySteps(fallbackJourney);
+            });
+    }, []);
 
-      <section className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <h2 className="text-sm font-semibold text-slate-100">Mobile</h2>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {skills.mobile.map((s) => (
-              <span
-                key={s}
-                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <h2 className="text-sm font-semibold text-slate-100">CI/CD & Testing</h2>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {skills.ciCd.map((s) => (
-              <span
-                key={s}
-                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <h2 className="text-sm font-semibold text-slate-100">Tooling & More</h2>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {[...skills.tooling, ...skills.other].map((s) => (
-              <span
-                key={s}
-                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-        <style>{`
+    // CODE SNIPPET LOOP ANIMATION
+    const [snippetIndex, setSnippetIndex] = useState(0);
+    const [displayed, setDisplayed] = useState('');
+    const [typing, setTyping] = useState(false);
+    // Dino jump effect
+    const [dinoJump, setDinoJump] = useState(false);
+    const [showFinal, setShowFinal] = useState(false);
+
+    useEffect(() => {
+        if (!journeySteps || !Array.isArray(journeySteps)) return;
+
+        // If we're at the last (final) message, do not loop again, just blink
+        if (snippetIndex >= journeySteps.length) return;
+
+        let timeout;
+        let animation;
+        setTyping(true);
+        let char = 0;
+        function typeNextChar() {
+            setDisplayed(journeySteps[snippetIndex].slice(0, char + 1));
+            char++;
+            if (char < journeySteps[snippetIndex].length) {
+                animation = setTimeout(typeNextChar, 26 + Math.random() * 30);
+            } else {
+                setTyping(false);
+                // Trigger dino jump when a milestone completes
+                setDinoJump(true);
+                setTimeout(() => setDinoJump(false), 430);
+                // If not at last step, move to next after pause
+                if (snippetIndex < journeySteps.length - 1) {
+                    timeout = setTimeout(() => {
+                        setSnippetIndex(i => i + 1);
+                    }, 1050 + Math.random() * 950);
+                } else {
+                    // At last step, after pause, show final message and don't repeat
+                    timeout = setTimeout(() => {
+                        setShowFinal(true);
+                    }, 1250);
+                }
+            }
+        }
+        typeNextChar();
+        return () => {
+            clearTimeout(timeout);
+            clearTimeout(animation);
+        };
+    }, [snippetIndex, journeySteps]);
+
+    // For the terminal rendering
+    let contentLine;
+    if (!showFinal) {
+        contentLine = (
+            <span>{displayed}<span className="ml-1 animate-pulse">▍</span></span>
+        );
+    } else {
+        contentLine = (
+            <span className="text-green-400 animate-blink-slow">$ Looking for next challenge… <span
+                className="ml-1 animate-pulse">▍</span></span>
+        );
+    }
+
+    // Dino/hoops/progress render logic
+    const totalMilestones = journeySteps ? journeySteps.length : 0;
+    const currentStep = showFinal ? totalMilestones : snippetIndex + 1;
+    // Progress bar percentage
+    const progressPercent = totalMilestones > 1 ? ((currentStep - 1) / (totalMilestones - 1)) * 100 : 100;
+    // Dino's position in px (it tracks the progress bar visually)
+    const dinoLeft = showFinal
+        ? '50%'
+        : `calc(${Math.max(0, (currentStep - 1) / (totalMilestones - 1) * 80)}%)`;
+    // Handle center of bar for final state
+
+    return (
+        <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 pb-12 pt-8">
+            <section className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] md:items-center">
+                <div className="relative">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400">
+                        Android · Kotlin · Jetpack Compose
+                    </p>
+                    <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
+                        {profile.name}
+                    </h1>
+                    <p className="mt-1 text-lg text-slate-200">{profile.title}</p>
+                    <p className="mt-3 text-sm text-slate-300">
+                        {profile.summary}
+                    </p>
+                    <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
+                        <a
+                            href={profile.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-xl px-4 py-2 font-semibold text-white border-2 border-cyan-400 shadow-[0_0_12px_#22d3ee,0_0_32px_#0ea5e9] hover:bg-cyan-400/10 hover:text-cyan-200 transition backdrop-blur-md"
+                        >
+                            View LinkedIn →
+                        </a>
+                        <a
+                            href="/assets/Rituraj-Sambherao-CV.pdf"
+                            download="Rituraj-Sambherao-CV.pdf"
+                            className="rounded-xl px-4 py-2 font-semibold text-white border-2 border-cyan-400 shadow-[0_0_12px_#22d3ee,0_0_32px_#0ea5e9] hover:bg-cyan-400/10 hover:text-cyan-200 transition backdrop-blur-md flex items-center"
+                            style={{marginLeft: '0.5rem'}}
+                        >
+                            Download CV
+                        </a>
+                    </div>
+                </div>
+                <div className="relative flex items-center justify-center">
+                    {/* Animated Code Snippet Terminal with dino, hoops, and progress bar */}
+                    <div
+                        className="h-56 w-56 max-w-[95vw] flex flex-col justify-end items-center bg-black/40 rounded-3xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_24px_#22d3ee,0_0_32px_#0ea5e9] ring-2 ring-cyan-400/20 backdrop-blur-md"
+                        style={{minHeight: '12rem'}}>
+                        {/* Hoops Row (hide at final) */}
+                        {!showFinal && (
+                            <div className="flex justify-between items-end w-full px-5 pt-5" style={{height: '1.4rem'}}>
+                                {Array.from({length: totalMilestones}).map((_, i) => (
+                                    <span key={i}
+                                          className={`inline-block rounded-full border-[2.5px] mx-[2px] ${i < currentStep ? 'border-cyan-400 bg-cyan-400/30' : 'border-cyan-900 bg-cyan-950/10'} duration-200`}
+                                          style={{width: '11px', height: '11px'}}/>
+                                ))}
+                            </div>
+                        )}
+                        {/* Progress Bar (hide at final) */}
+                        {!showFinal && (
+                            <div
+                                className="w-[84%] mt-2 mb-2 h-2 bg-cyan-900/50 rounded-full overflow-hidden flex items-center">
+                                <div className="h-full transition-all duration-300 bg-cyan-400 rounded-full"
+                                     style={{width: `${progressPercent}%`}}/>
+                            </div>
+                        )}
+                        {/* Dino Row */}
+                        <div className="relative flex items-end justify-center w-full flex-col flex-1">
+                            {/* Moving Dino (final state: center vertically) */}
+                            {!showFinal ? (
+                                <div
+                                    className={`absolute bottom-0 duration-200 transition-all`} style={{
+                                    left: `calc(${progressPercent}% - 18px)`,
+                                    transitionTimingFunction: 'cubic-bezier(.55,1.55,.4,1)'
+                                }}>
+                                    {/* 8-bit sideways dino SVG */}
+                                    <svg width="36" height="28" viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="40" height="34" rx="6" fill="#171a22"/>
+                                        <rect x="6" y="18" width="8" height="4" fill="#aef9fb"/>
+                                        <rect x="14" y="14" width="14" height="8" fill="#71e0ed"/>
+                                        <rect x="28" y="18" width="6" height="4" fill="#58c2e8"/>
+                                        <rect x="22" y="10" width="6" height="12" fill="#29a8dd"/>
+                                        <rect x="18" y="6" width="10" height="8" fill="#2ec2c9"/>
+                                        <rect x="16" y="22" width="10" height="6" fill="#23bcbc"/>
+                                        {/* Eye */}
+                                        <rect x="24" y="13" width="2" height="2" fill="#161c21"/>
+                                    </svg>
+                                </div>
+                            ) : (
+                                <div
+                                    className="w-full flex items-center flex-col justify-center duration-300"
+                                    style={{transform: 'scale(2.5)', transition: 'transform 0.7s'}}
+                                >
+                                    {/* Front-facing dino */}
+                                    <svg width="36" height="48" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+                                        {/* Head */}
+                                        <rect x="11" y="2" width="14" height="10" rx="3" fill="#43e2d5"/>
+                                        <rect x="7" y="12" width="22" height="17" rx="4" fill="#6df6ed"/>
+                                        <rect x="14" y="9" width="8" height="3" fill="#23bcbc"/>
+                                        {/* Body */}
+                                        <rect x="14" y="29" width="8" height="12" rx="2" fill="#20a7c6"/>
+                                        <rect x="8" y="38" width="20" height="7" rx="3" fill="#2ed2c9"/>
+                                        {/* Eyes */}
+                                        <rect x="15" y="7" width="2" height="2" fill="#161c21"/>
+                                        <rect x="19" y="7" width="2" height="2" fill="#161c21"/>
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
+                        {/* Terminal text */}
+                        <div className="w-full flex-1 flex flex-col justify-center">
+                            <div
+                                className="font-mono text-cyan-200 text-sm leading-6 tracking-tight p-6 min-h-[3rem] overflow-y-auto break-words text-center">
+                                {showFinal ? (
+                                    <span className="text-green-400 animate-blink-slow block text-center mt-6">Next level loading…<span
+                                        className="ml-1 animate-pulse">▍</span></span>
+                                ) : contentLine}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="grid gap-6 md:grid-cols-3">
+                <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <h2 className="text-sm font-semibold text-slate-100">Mobile</h2>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {skills.mobile.map((s) => (
+                            <span
+                                key={s}
+                                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
+                            >
+                                {s}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+                <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <h2 className="text-sm font-semibold text-slate-100">CI/CD & Testing</h2>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {skills.ciCd.map((s) => (
+                            <span
+                                key={s}
+                                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
+                            >
+                                {s}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+                <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                    <h2 className="text-sm font-semibold text-slate-100">Tooling & More</h2>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {[...skills.tooling, ...skills.other].map((s) => (
+                            <span
+                                key={s}
+                                className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
+                            >
+                                {s}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </section>
+            <style>{`
         @keyframes mascot-float {
           0%, 100% {
             transform: translateY(0);
@@ -83,7 +267,14 @@ export default function Home() {
             transform: translateY(20px);
           }
         }
+        @keyframes blink-slow {
+          0%, 100% { opacity: 1; }
+          47%, 53% { opacity: 0.1; }
+        }
+        .animate-blink-slow {
+          animation: blink-slow 1.65s infinite linear;
+        }
       `}</style>
-    </main>
-  );
+        </main>
+    );
 }

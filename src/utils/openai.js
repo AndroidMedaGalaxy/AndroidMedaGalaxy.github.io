@@ -5,6 +5,7 @@
 // Suggested query prompts for quick access
 export function getSuggestedQueries() {
     return [
+        "Say hi to the assistant",
         "About Rituraj Sambherao",
         "Rituraj's experience",
         "Skills and technologies he uses",
@@ -24,7 +25,22 @@ export async function generateResponseOpenAI({userMessage}) {
     if (/download cv|cv|resume/i.test(userMessage)) {
         return "<<DOWNLOAD_CV>>";
     }
-    // Removed companies/org shortcut -- allow context and backend to answer naturally
+
+    // Compute a lightweight local time-of-day hint from the browser (if available)
+    let userLocalTimeOfDay;
+    try {
+        if (typeof window !== 'undefined' && window?.Intl && typeof Date !== 'undefined') {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) userLocalTimeOfDay = 'morning';
+            else if (hour >= 12 && hour < 17) userLocalTimeOfDay = 'afternoon';
+            else if (hour >= 17 && hour < 22) userLocalTimeOfDay = 'evening';
+            else userLocalTimeOfDay = 'night';
+        }
+    } catch (_) {
+        // If anything goes wrong, just skip this hint
+        userLocalTimeOfDay = undefined;
+    }
+
     // Adjust apiUrl: use absolute URL so requests work from GitHub Pages/static host
     // TODO: Replace this with your actual deployed backend URL (e.g. Vercel serverless function)
     const apiUrl = 'https://android-meda-galaxy-github-io.vercel.app/api/chat'; // <-- Fill in with your deployed backend endpoint
@@ -39,7 +55,8 @@ export async function generateResponseOpenAI({userMessage}) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                message: userMessage
+                message: userMessage,
+                userLocalTimeOfDay,
             }),
         });
 
