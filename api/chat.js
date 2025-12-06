@@ -120,30 +120,24 @@ export default async function handler(req, res) {
 
   // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
-      console.log('OPTIONS preflight');
     return res.status(200).end();
   }
 
   // Only allow POST requests
   if (req.method !== 'POST') {
-      console.warn('Request denied: Not POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-      console.log('Processing body:', req.body);
     const { message, userMessage } = req.body;
     const finalMessage = message || userMessage;
-      console.log('Received message:', finalMessage);
 
     if (!finalMessage || typeof finalMessage !== 'string') {
-        console.warn('Bad or missing "message" in body');
       return res.status(400).json({ error: 'Message is required' });
     }
 
     // Check scope server-side
     if (!isInScope(finalMessage)) {
-        console.log('Query out of scope:', finalMessage);
       return res.status(200).json({
         reply: "I'm here to answer questions about Rituraj Sambherao's professional work, experience, projects, or articles."
       });
@@ -151,19 +145,15 @@ export default async function handler(req, res) {
 
     // Retrieve context SERVER-SIDE using secure context data
     const contextSnippet = retrieveRelevantContext(contextData, finalMessage);
-      console.log('Context snippet:', contextSnippet);
 
     if (!contextSnippet || contextSnippet.length < 10) {
-        console.log('No relevant context found');
       return res.status(200).json({
         reply: "I can only answer questions related to Rituraj Sambherao's experience, projects, and articles."
       });
     }
 
     // Get OpenAI API key from environment variable
-      const apiKey = process.env.OPENAI_API_KEY;
-      console.log('ENV ALL:', process.env);
-      console.log('DEBUG ENV apiKey:', apiKey);
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       console.error('OPENAI_API_KEY environment variable is not set');
       return res.status(500).json({ error: 'Server configuration error' });
@@ -172,41 +162,37 @@ export default async function handler(req, res) {
     // System prompt
     const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
 
-      // Prepare OpenAI payload
-      const chatPayload = {
-          model: 'gpt-4o-mini',
-          messages: [
-              {role: 'system', content: SYSTEM_PROMPT},
-              {role: 'user', content: `Context:\n${contextSnippet}`},
-              {role: 'user', content: finalMessage}
-          ],
-          max_tokens: 380,
-          temperature: 0.7,
-      };
-      console.log('OpenAI request payload:', chatPayload);
+    // Prepare OpenAI payload
+    const chatPayload = {
+      model: 'gpt-4o-mini',
+      messages: [
+        {role: 'system', content: SYSTEM_PROMPT},
+        {role: 'user', content: `Context:\n${contextSnippet}`},
+        {role: 'user', content: finalMessage}
+      ],
+      max_tokens: 380,
+      temperature: 0.7,
+    };
 
-      // Call OpenAI API
+    // Call OpenAI API
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-        body: JSON.stringify(chatPayload),
+      body: JSON.stringify(chatPayload),
     });
 
     if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.text();
-      console.error('OpenAI API Error:', openAIResponse.status, errorData);
+      console.error('OpenAI API Error:', openAIResponse.status);
       return res.status(500).json({ error: 'Failed to get response from AI service' });
     }
 
     const data = await openAIResponse.json();
-      console.log('OpenAI raw response:', data);
     const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't find an answer.";
 
     // Return the response
-      console.log('Final reply:', reply);
     return res.status(200).json({ reply });
 
   } catch (error) {

@@ -18,7 +18,6 @@ export default function Articles() {
         setArticles(data.items);
         setState('ready');
       } catch (e) {
-        console.error(e);
         setState('error');
       }
     }

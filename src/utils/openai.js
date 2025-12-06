@@ -35,14 +35,12 @@ export async function generateResponseOpenAI({userMessage}) {
         });
 
         if (!resp.ok) {
-            console.error('API error:', resp.status, await resp.text());
             return "Sorry, I couldn't reach the assistant service.";
         }
 
         const data = await resp.json();
         return data.reply || "Sorry, I couldn't find an answer.";
     } catch (error) {
-        console.error('Fetch error:', error);
         return "Sorry, there was an error contacting the assistant.";
     }
 }

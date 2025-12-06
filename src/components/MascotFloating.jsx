@@ -80,21 +80,19 @@ export default function MascotFloating() {
         if (!contextData) {
             fetch('/data/context.json')
                 .then(r => {
-                    console.log('Fetching /data/context.json. HTTP status:', r.status);
                     if (!r.ok) {
                         throw new Error(`Status ${r.status}`);
                     }
                     return r.json();
                 })
                 .then(setContextData)
-                .catch((e) => {
+                .catch(() => {
                     setContextData([]);
                     setMessages(msgs => [...msgs, {
                         role: 'assistant',
                         text: "Unable to load or find /data/context.json. Please ensure your context file is placed in the public/data/ folder and accessible.",
                         timestamp: new Date(),
                     }]);
-                    console.error('Error loading /data/context.json:', e);
                 });
         }
     }, [contextData]);
