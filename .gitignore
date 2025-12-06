@@ -1,3 +1,29 @@
+node_modules/
 # ...existing patterns...
 dist/
 .idea/
+# Do not track Vite/OpenAI secrets or keys in typings or local environment files
+node_modules/vite/types/importMeta.d.ts # contains OpenAI API key, must NOT be in GitHub
+ai_env
+/api/context.js
+
+# Added common ignores
+# Environment files (should not be committed)
+.env
+.env.*.local
+
+# macOS
+.DS_Store
+
+# Editor/IDE
+.vscode/
+
+# Vite / build caches
+.vite/
+.cache/
+
+# Debug / log files
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vercel

@@ -31,7 +31,7 @@ function AppInner() {
                 <Route path="/contact" element={<Contact/>}/>
             </Routes>
             <Footer/>
-            <MascotFloating {...mascotHomeProps}/>
+            <MascotFloating/>
         </div>
     );
 }
