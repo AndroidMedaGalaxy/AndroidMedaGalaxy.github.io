@@ -5,20 +5,26 @@
 // Suggested query prompts for quick access
 export function getSuggestedQueries() {
     return [
+        "About Rituraj Sambherao",
         "Rituraj's experience",
-        "About Rituraj",
-        "Rituraj's blog articles",
-        "Rituraj's company history",
-        "Rituraj's technical skills",
-        "Rituraj's open source work",
-        "Rituraj's education & certifications",
-        "Rituraj's interests"
+        "Skills and technologies he uses",
+        "Companies he has worked for",
+        "Education and certifications",
+        "Show his interests",
+        "What is BigBang Android Starter?",
+        "View blog articles",
+        "Download CV"
     ];
 }
 
 // Main function to send message to secure serverless API
 // All context retrieval and OpenAI calls happen server-side
 export async function generateResponseOpenAI({userMessage}) {
+    // CV trigger: Recognize requests for CV, resume, download CV
+    if (/download cv|cv|resume/i.test(userMessage)) {
+        return "<<DOWNLOAD_CV>>";
+    }
+    // Removed companies/org shortcut -- allow context and backend to answer naturally
     // Adjust apiUrl: use absolute URL so requests work from GitHub Pages/static host
     // TODO: Replace this with your actual deployed backend URL (e.g. Vercel serverless function)
     const apiUrl = 'https://android-meda-galaxy-github-io.vercel.app/api/chat'; // <-- Fill in with your deployed backend endpoint

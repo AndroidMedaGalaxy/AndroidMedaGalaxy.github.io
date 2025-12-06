@@ -9,7 +9,7 @@ import {contextData} from './context.js';
 function isInScope(query) {
   const allowedDomains = [
     'android', 'kotlin', 'compose', 'experience', 'project', 'cv', 'portfolio', 'skill', 'article', 'blog', 'medium', 'rituraj sambherao',
-    'about', 'summary', 'profile', 'company', 'open source', 'education', 'certifications',
+      'about', 'summary', 'profile', 'company', 'companies', 'organization', 'organizations', 'organisation', 'organisations', 'open source', 'education', 'certifications',
     'sap', 'toast', 'mastercard', 'nitor', 'corona-warn', 'digital aged', 'internationalization', 'payment gateway',
     'interest', 'interests', 'hobby', 'hobbies', 'pc building', 'pc_building', 'gaming',
     'motorcycle', 'bike', 'motorcycling', 'car', 'cars', 'motorhead', 'motorsport',
@@ -63,6 +63,9 @@ function retrieveRelevantContext(context, query) {
 
   // Special matches for specific queries
   const specialMatches = [
+      {keyword: 'companies', sectionMatch: 'companies'},
+      {keyword: 'organizations', sectionMatch: 'companies'},
+      {keyword: 'organisation', sectionMatch: 'companies'},
     {keyword: 'toast', sectionMatch: 'toast'},
     {keyword: 'mastercard', sectionMatch: 'mastercard'},
     {keyword: 'sap', sectionMatch: 'sap'},
@@ -160,7 +163,7 @@ export default async function handler(req, res) {
     }
 
     // System prompt
-    const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
+      const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. You may use up to 2 appropriate, friendly, or professional emojis per response (ideally to add a dash of visual clarity or personality), but never add more than 2, and it's fine to use none. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
 
     // Prepare OpenAI payload
     const chatPayload = {
