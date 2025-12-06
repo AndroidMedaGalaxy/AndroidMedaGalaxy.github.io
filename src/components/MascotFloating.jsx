@@ -88,11 +88,6 @@ export default function MascotFloating() {
                 .then(setContextData)
                 .catch(() => {
                     setContextData([]);
-                    setMessages(msgs => [...msgs, {
-                        role: 'assistant',
-                        text: "Unable to load or find /data/context.json. Please ensure your context file is placed in the public/data/ folder and accessible.",
-                        timestamp: new Date(),
-                    }]);
                 });
         }
     }, [contextData]);
@@ -235,7 +230,7 @@ export default function MascotFloating() {
                                     placeholder="Type your message…"
                                     className="flex-grow bg-black/40 border border-transparent rounded-full px-5 py-2 text-white placeholder:text-white/50 outline-none transition focus:border-purple-500 shadow-sm focus:shadow-purple-500/50"
                                     autoFocus={open}
-                                    disabled={!isContextLoaded || typing}
+                                    disabled={typing}
                                 />
                                 <button
                                     type="submit"
