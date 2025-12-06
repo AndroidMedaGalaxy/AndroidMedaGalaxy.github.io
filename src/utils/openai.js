@@ -35,7 +35,18 @@ export async function generateResponseOpenAI({userMessage}) {
         });
 
         if (!resp.ok) {
-            return "Sorry, I couldn't reach the assistant service.";
+            console.error("Assistant service response not OK", {
+                status: resp.status,
+                statusText: resp.statusText,
+                url: apiUrl
+            });
+            try {
+                const errorBody = await resp.text();
+                console.error("Error body:", errorBody);
+            } catch (e) {
+                console.error("Unable to parse error body");
+            }
+            return "Sorry, I couldn't reach the assistant service. This may be due to a temporary network issue or possible misconfiguration. Please try again later, and contact the site owner if the problem persists.";
         }
 
         const data = await resp.json();
