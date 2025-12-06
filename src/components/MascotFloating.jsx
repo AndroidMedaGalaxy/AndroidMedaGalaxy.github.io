@@ -1,7 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {HiOutlineChatBubbleOvalLeft} from 'react-icons/hi2';
 import {motion, AnimatePresence} from 'framer-motion';
-import {retrieveRelevantContext, generateResponseOpenAI, getSuggestedQueries} from '../utils/openai';
+import {generateResponseOpenAI, getSuggestedQueries} from '../utils/openai';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -65,21 +64,6 @@ function TypingIndicator() {
     );
 }
 
-const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You must ONLY answer questions using the provided context: experience, projects, skills, and blog summaries. If the user asks anything unrelated, politely decline. Be concise, clear, and professional.`;
-
-function getOpenAIKeyFromEnvFile() {
-    try {
-        // Works in dev/Node: fetch ai_env file from public
-        return fetch('/ai_env')
-            .then(r => r.text())
-            .then(text => {
-                const match = text.match(/AI_OPENAI_API_KEY=(\S+)/);
-                return match ? match[1] : '';
-            });
-    } catch (e) {
-        return Promise.resolve('');
-    }
-}
 
 export default function MascotFloating() {
     const [open, setOpen] = useState(false);
@@ -90,7 +74,6 @@ export default function MascotFloating() {
     const [typing, setTyping] = useState(false);
     const messagesEndRef = useRef(null);
     const [contextData, setContextData] = useState(null);
-    const [aiKey, setAIKey] = useState('');
 
     // Load context from /data/context.json once
     useEffect(() => {
@@ -116,13 +99,6 @@ export default function MascotFloating() {
         }
     }, [contextData]);
 
-    // Fetch OpenAI key from ai_env
-    useEffect(() => {
-        if (!aiKey) {
-            getOpenAIKeyFromEnvFile().then(setAIKey);
-        }
-    }, [aiKey]);
-
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({behavior: 'smooth', block: 'end'});
@@ -142,15 +118,6 @@ export default function MascotFloating() {
 
     async function sendMessage(evt, overrideText = null) {
         if (evt) evt.preventDefault();
-        if (!isContextLoaded) {
-            setMessages(msgs => [...msgs, {
-                role: 'assistant',
-                text: "I'm still loading my background info. Please wait a moment and try again.",
-                timestamp: new Date()
-            }]);
-            setTyping(false);
-            return;
-        }
         const msg = overrideText !== null ? overrideText : input.trim();
         if (!msg) return;
         const now = new Date();
@@ -159,13 +126,9 @@ export default function MascotFloating() {
         setTyping(true);
         let respText = '';
         try {
-            const contextSnippet = retrieveRelevantContext(contextData, msg);
-            console.log('User Q:', msg, '\nContext snippet:', contextSnippet, '\nContext length:', contextSnippet.length, '\nAPI Key:', aiKey);
-            console.log('Before calling OpenAI API');
+            // All context retrieval and OpenAI calls happen securely on the server
             respText = await generateResponseOpenAI({
-                userMessage: msg,
-                contextSnippet,
-                apiKey: aiKey
+                userMessage: msg
             });
         } catch (e) {
             respText = "Sorry, there was an error contacting the assistant.";
@@ -281,7 +244,7 @@ export default function MascotFloating() {
                                     className="bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full p-3 text-white text-xl shadow-[0_0_14px_#a855f7] hover:scale-105 transition active:scale-95"
                                     style={{boxShadow: "0 0 16px 1px #a855f7, 0 0 8px #0ea5e9"}}
                                     aria-label="Send"
-                                    disabled={!isContextLoaded || typing}
+                                    disabled={typing}
                                 >
                                     <svg width="24" height="24" fill="none">
                                         <path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="#fff" strokeWidth={2}/>

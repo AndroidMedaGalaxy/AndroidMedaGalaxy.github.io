@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "start": "vercel dev",
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",

@@ -5,12 +5,11 @@ dist/
 # Do not track Vite/OpenAI secrets or keys in typings or local environment files
 node_modules/vite/types/importMeta.d.ts # contains OpenAI API key, must NOT be in GitHub
 ai_env
-/public/data/context.json
+/api/context.js
 
 # Added common ignores
 # Environment files (should not be committed)
 .env
-.env.local
 .env.*.local
 
 # macOS
@@ -27,3 +26,4 @@ ai_env
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.vercel
