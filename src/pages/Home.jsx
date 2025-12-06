@@ -128,7 +128,7 @@ export default function Home() {
                             View LinkedIn →
                         </a>
                         <a
-                            href="/assets/Rituraj-Sambherao-CV.pdf"
+                            href="/assets/Rituraj_Sambherao_CV.pdf"
                             download="Rituraj-Sambherao-CV.pdf"
                             className="rounded-xl px-4 py-2 font-semibold text-white border-2 border-cyan-400 shadow-[0_0_12px_#22d3ee,0_0_32px_#0ea5e9] hover:bg-cyan-400/10 hover:text-cyan-200 transition backdrop-blur-md flex items-center"
                             style={{marginLeft: '0.5rem'}}
