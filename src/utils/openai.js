@@ -19,9 +19,12 @@ export function getSuggestedQueries() {
 // Main function to send message to secure serverless API
 // All context retrieval and OpenAI calls happen server-side
 export async function generateResponseOpenAI({userMessage}) {
-    // Call Vercel serverless function - handles everything server-side
-    // Use relative URL so it works on any port (vercel dev uses dynamic ports)
-    const apiUrl = '/api/chat';
+    // Adjust apiUrl: use absolute URL so requests work from GitHub Pages/static host
+    // TODO: Replace this with your actual deployed backend URL (e.g. Vercel serverless function)
+    const apiUrl = 'https://android-meda-galaxy-github-io.vercel.app/api/chat'; // <-- Fill in with your deployed backend endpoint
+    // Optionally auto-detect localhost for local dev
+    // const apiUrl = window.location.hostname === 'localhost' 
+    //     ? '/api/chat' : 'https://YOUR_BACKEND_DOMAIN/api/chat';
 
     try {
         const resp = await fetch(apiUrl, {
@@ -49,9 +52,15 @@ export async function generateResponseOpenAI({userMessage}) {
             return "Sorry, I couldn't reach the assistant service. This may be due to a temporary network issue or possible misconfiguration. Please try again later, and contact the site owner if the problem persists.";
         }
 
-        const data = await resp.json();
-        return data.reply || "Sorry, I couldn't find an answer.";
+        try {
+            const data = await resp.json();
+            return data.reply || "Sorry, I couldn't find an answer.";
+        } catch (e) {
+            console.error("Error parsing assistant service JSON:", e);
+            return "Sorry, there was an error processing the assistant's response.";
+        }
     } catch (error) {
+        console.error("Network or fetch error:", error);
         return "Sorry, there was an error contacting the assistant.";
     }
 }
