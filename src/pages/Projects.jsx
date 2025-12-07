@@ -10,15 +10,27 @@ export default function Projects() {
                 demo.
             </p>
             <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {projects.map(project => (
-                    <div key={project.name}
-                         className="flex flex-col rounded-xl border border-slate-800 bg-slate-900/70 shadow-teal-500/40 shadow-lg hover:scale-[1.025] transition-transform">
-                        <div
-                            className="h-40 w-full overflow-hidden rounded-t-xl border-b border-slate-800 bg-slate-950 flex items-center justify-center">
-                            <img src={import.meta.env.BASE_URL + project.image} alt={project.name}
-                                 className="object-cover h-full w-full"/>
-                        </div>
-                        <div className="flex-1 p-4 flex flex-col">
+                {projects.map(project => {
+                    const mainLink = project.info || project.github;
+                    const TileWrapper = mainLink ? 'a' : 'div';
+                    const wrapperProps = mainLink ? {
+                        href: mainLink,
+                        target: '_blank',
+                        rel: 'noopener noreferrer'
+                    } : {};
+
+                    return (
+                        <TileWrapper
+                            key={project.name}
+                            {...wrapperProps}
+                            className="flex flex-col rounded-xl border border-slate-800 bg-slate-900/70 shadow-teal-500/40 shadow-lg hover:scale-[1.025] transition-transform cursor-pointer"
+                        >
+                            <div
+                                className="h-40 w-full overflow-hidden rounded-t-xl border-b border-slate-800 bg-slate-950 flex items-center justify-center">
+                                <img src={import.meta.env.BASE_URL + project.image} alt={project.name}
+                                     className="object-cover h-full w-full"/>
+                            </div>
+                            <div className="flex-1 p-4 flex flex-col">
                             <h2 className="text-lg font-bold text-teal-300 mb-1">{project.name}</h2>
                             <p className="text-sm text-slate-200 mb-3 line-clamp-3">{project.description}</p>
                             <div className="flex flex-wrap gap-2 mb-3">
@@ -51,17 +63,32 @@ export default function Projects() {
                             )}
                             <div className="flex gap-2 mt-auto">
                                 {project.github && (
-                                    <a href={project.github} target="_blank" rel="noopener noreferrer"
-                                       className="text-xs font-medium rounded bg-teal-500 px-3 py-1 text-slate-950 hover:bg-teal-400 transition">GitHub</a>
+                                    <a
+                                        href={project.github}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-xs font-medium rounded bg-teal-500 px-3 py-1 text-slate-950 hover:bg-teal-400 transition z-10 relative"
+                                    >
+                                        GitHub
+                                    </a>
                                 )}
                                 {project.info && (
-                                    <a href={project.info} target="_blank" rel="noopener noreferrer"
-                                       className="text-xs font-medium rounded bg-slate-800 px-3 py-1 text-teal-300 hover:bg-teal-500 transition">Info</a>
+                                    <a
+                                        href={project.info}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-xs font-medium rounded bg-slate-800 px-3 py-1 text-teal-300 hover:bg-teal-500 transition z-10 relative"
+                                    >
+                                        Info
+                                    </a>
                                 )}
                             </div>
                         </div>
-                    </div>
-                ))}
+                    </TileWrapper>
+                    );
+                })}
             </div>
         </main>
     );

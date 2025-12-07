@@ -7,19 +7,13 @@ export default function Home() {
     const [journeySteps, setJourneySteps] = useState(null);
     // Default fallback journey in case JSON fetch fails or is missing
     const fallbackJourney = [
-        '$ starting coding journey…',
-        '$ Learning in school and exploring computers…',
-        '$ Completed undergrad at Pune University',
-        '$ Working in B2B mobile at Nitor',
-        '$ Pursuing MSc at UCD in Dublin',
-        '$ Joined SAP, work on Corona-Warn-App',
-        '$ Built Digital Aged Care project',
-        '$ Joined Mastercard, fintech SDKs',
-        '$ Engineered Gateway SDK',
-        '$ Joined Toast',
-        '$ Leading Toast POS internationalization 🚀',
-        '$ Kotlin/Compose focus ✓'
+        '$ Initializing Android runtime...',
+        '$ Kotlin compiler & coroutines loaded',
+        '$ Jetpack Compose UI toolkit mounted',
+        '$ ViewModel & navigation graph ready',
+        '$ All systems green • Ready to compose'
     ];
+
     useEffect(() => {
         fetch('/data/journey.json')
             .then(r => {
@@ -165,40 +159,62 @@ export default function Home() {
                             {/* Moving Dino (final state: center vertically) */}
                             {!showFinal ? (
                                 <div
-                                    className={`absolute bottom-0 duration-200 transition-all`} style={{
+                                    className={`absolute bottom-0 duration-200 transition-all dino-side-walk`} style={{
                                     left: `calc(${progressPercent}% - 18px)`,
                                     transitionTimingFunction: 'cubic-bezier(.55,1.55,.4,1)'
                                 }}>
-                                    {/* 8-bit sideways dino SVG */}
+                                    {/* 8-bit sideways dino SVG with natural movements */}
                                     <svg width="36" height="28" viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg">
                                         <rect width="40" height="34" rx="6" fill="#171a22"/>
-                                        <rect x="6" y="18" width="8" height="4" fill="#aef9fb"/>
-                                        <rect x="14" y="14" width="14" height="8" fill="#71e0ed"/>
-                                        <rect x="28" y="18" width="6" height="4" fill="#58c2e8"/>
-                                        <rect x="22" y="10" width="6" height="12" fill="#29a8dd"/>
-                                        <rect x="18" y="6" width="10" height="8" fill="#2ec2c9"/>
-                                        <rect x="16" y="22" width="10" height="6" fill="#23bcbc"/>
-                                        {/* Eye */}
-                                        <rect x="24" y="13" width="2" height="2" fill="#161c21"/>
+                                        {/* Body - subtle breathing */}
+                                        <g className="dino-body-breathe">
+                                            <rect x="6" y="18" width="8" height="4" fill="#aef9fb"/>
+                                            <rect x="14" y="14" width="14" height="8" fill="#71e0ed"/>
+                                            <rect x="28" y="18" width="6" height="4" fill="#58c2e8"/>
+                                            <rect x="22" y="10" width="6" height="12" fill="#29a8dd"/>
+                                            <rect x="16" y="22" width="10" height="6" fill="#23bcbc"/>
+                                        </g>
+                                        {/* Head - subtle tilt */}
+                                        <g className="dino-head-tilt">
+                                            <rect x="18" y="6" width="10" height="8" fill="#2ec2c9"/>
+                                            {/* Eye with blink */}
+                                            <rect x="24" y="13" width="2" height="2" fill="#161c21" className="dino-eye-blink"/>
+                                        </g>
+                                        {/* Feather/crest details - subtle wave */}
+                                        <g className="dino-feather-wave">
+                                            <rect x="20" y="4" width="2" height="3" fill="#43e2d5" opacity="0.7"/>
+                                            <rect x="23" y="3" width="2" height="4" fill="#43e2d5" opacity="0.8"/>
+                                            <rect x="26" y="4" width="2" height="3" fill="#43e2d5" opacity="0.7"/>
+                                        </g>
                                     </svg>
                                 </div>
                             ) : (
                                 <div
-                                    className="w-full flex items-center flex-col justify-center duration-300"
+                                    className="w-full flex items-center flex-col justify-center duration-300 dino-final-idle"
                                     style={{transform: 'scale(2.5)', transition: 'transform 0.7s'}}
                                 >
-                                    {/* Front-facing dino */}
+                                    {/* Front-facing dino with natural movements */}
                                     <svg width="36" height="48" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
-                                        {/* Head */}
-                                        <rect x="11" y="2" width="14" height="10" rx="3" fill="#43e2d5"/>
-                                        <rect x="7" y="12" width="22" height="17" rx="4" fill="#6df6ed"/>
-                                        <rect x="14" y="9" width="8" height="3" fill="#23bcbc"/>
-                                        {/* Body */}
-                                        <rect x="14" y="29" width="8" height="12" rx="2" fill="#20a7c6"/>
-                                        <rect x="8" y="38" width="20" height="7" rx="3" fill="#2ed2c9"/>
-                                        {/* Eyes */}
-                                        <rect x="15" y="7" width="2" height="2" fill="#161c21"/>
-                                        <rect x="19" y="7" width="2" height="2" fill="#161c21"/>
+                                        {/* Head with subtle bob */}
+                                        <g className="dino-head-bob">
+                                            <rect x="11" y="2" width="14" height="10" rx="3" fill="#43e2d5"/>
+                                            <rect x="14" y="9" width="8" height="3" fill="#23bcbc"/>
+                                            {/* Eyes with blink */}
+                                            <rect x="15" y="7" width="2" height="2" fill="#161c21" className="dino-eye-blink"/>
+                                            <rect x="19" y="7" width="2" height="2" fill="#161c21" className="dino-eye-blink"/>
+                                            {/* Crest feathers - wave animation */}
+                                            <g className="dino-crest-wave">
+                                                <rect x="13" y="0" width="2" height="3" fill="#43e2d5" opacity="0.6"/>
+                                                <rect x="17" y="-1" width="2" height="4" fill="#43e2d5" opacity="0.8"/>
+                                                <rect x="21" y="0" width="2" height="3" fill="#43e2d5" opacity="0.6"/>
+                                            </g>
+                                        </g>
+                                        {/* Body with breathing */}
+                                        <g className="dino-body-breathe">
+                                            <rect x="7" y="12" width="22" height="17" rx="4" fill="#6df6ed"/>
+                                            <rect x="14" y="29" width="8" height="12" rx="2" fill="#20a7c6"/>
+                                            <rect x="8" y="38" width="20" height="7" rx="3" fill="#2ed2c9"/>
+                                        </g>
                                     </svg>
                                 </div>
                             )}
@@ -273,6 +289,59 @@ export default function Home() {
         }
         .animate-blink-slow {
           animation: blink-slow 1.65s infinite linear;
+        }
+        
+        /* Natural dino animations */
+        @keyframes dino-breathe {
+          0%, 100% { transform: scale(1, 1); }
+          50% { transform: scale(1.02, 0.98); }
+        }
+        @keyframes dino-head-tilt {
+          0%, 100% { transform: rotate(0deg) translateY(0); }
+          25% { transform: rotate(-1deg) translateY(-0.5px); }
+          75% { transform: rotate(1deg) translateY(0.5px); }
+        }
+        @keyframes dino-head-bob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-1.5px); }
+        }
+        @keyframes dino-feather-wave {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          33% { transform: translateY(-1px) scaleY(1.1); }
+          66% { transform: translateY(0.5px) scaleY(0.95); }
+        }
+        @keyframes dino-crest-wave {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          50% { transform: translateY(-2px) scaleY(1.15); }
+        }
+        @keyframes dino-eye-blink {
+          0%, 90%, 100% { opacity: 1; transform: scaleY(1); }
+          93%, 97% { opacity: 0.1; transform: scaleY(0.1); }
+        }
+        
+        .dino-body-breathe {
+          animation: dino-breathe 3.2s ease-in-out infinite;
+          transform-origin: center;
+        }
+        .dino-head-tilt {
+          animation: dino-head-tilt 4.5s ease-in-out infinite;
+          transform-origin: center;
+        }
+        .dino-head-bob {
+          animation: dino-head-bob 2.8s ease-in-out infinite;
+          transform-origin: center bottom;
+        }
+        .dino-feather-wave {
+          animation: dino-feather-wave 2.5s ease-in-out infinite;
+          transform-origin: center bottom;
+        }
+        .dino-crest-wave {
+          animation: dino-crest-wave 3s ease-in-out infinite;
+          transform-origin: center bottom;
+        }
+        .dino-eye-blink {
+          animation: dino-eye-blink 5s ease-in-out infinite;
+          transform-origin: center;
         }
       `}</style>
         </main>

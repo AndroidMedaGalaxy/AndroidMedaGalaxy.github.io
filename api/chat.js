@@ -32,26 +32,36 @@ function isGreeting(raw) {
 
   const greetingPhrases = [
     'hi', 'hi there', 'hello', 'hello there', 'hey', 'hey there',
-    'yo', 'hiya', 'howdy',
+    'yo', 'yoo', 'hiya', 'howdy', 'greetings',
     'good morning', 'good afternoon', 'good evening', 'good night',
+    'morning', 'afternoon', 'evening',
     'how are you', 'how are you doing', "how's it going", 'how is it going',
-    "what's up", 'whats up', 'sup'
+    'hows it going', 'how do you do', 'how you doing',
+    "what's up", 'whats up', 'sup', 'wassup', 'whatsup',
+    'nice to meet you', 'pleased to meet you',
+    'thanks for being here', 'thank you'
   ];
 
-  // Very short messages (1–5 words) that are fully contained in greeting phrases
+  // Very short messages (1–8 words) that match greeting phrases
   const words = cleaned.split(' ');
-  if (words.length <= 5) {
+  if (words.length <= 8) {
+    // Exact match
     if (greetingPhrases.some(p => p === cleaned)) return true;
+
+    // Starts with greeting phrase (allows for punctuation/emoji variations)
+    if (greetingPhrases.some(p => cleaned.startsWith(p))) {
+      return true;
+    }
   }
 
   // If it starts with a greeting phrase and then only light filler
-  const fillerTokens = new Set(['there', 'mate', 'friend', 'buddy', 'man', 'dude']);
+  const fillerTokens = new Set(['there', 'mate', 'friend', 'buddy', 'man', 'dude', 'pal', 'bro', 'again']);
   for (const phrase of greetingPhrases) {
     if (cleaned.startsWith(phrase)) {
       const remaining = cleaned.slice(phrase.length).trim();
       if (!remaining) return true;
       const remWords = remaining.split(' ');
-      if (remWords.every(w => fillerTokens.has(w))) return true;
+      if (remWords.length <= 3 && remWords.every(w => fillerTokens.has(w))) return true;
     }
   }
 
@@ -207,7 +217,13 @@ export default async function handler(req, res) {
     }
 
     // UPDATED System prompt
-      const SYSTEM_PROMPT = `You are the AndroidMeda Assistant. You answer ONLY using the provided context snippet: experience, projects, skills, interests, and blog summaries. When a user's query matches a context entry, reply with the full content for that entry (for example, if asked about interests, list the interests directly). Be concise, clear, and professional. If a user greets you (says hi, hello, hey, or similar), respond in a friendly and polite manner as the assistant, and you may comment briefly on the weather (for their likely location or time of day) but only sometimes, not every time, to keep things personable and varied. You may use up to 2 appropriate, friendly, or professional emojis per response (ideally to add a dash of visual clarity or personality), but never add more than 2, and it's fine to use none. Format your answers with paragraphs and add ONE empty line after each paragraph or section so responses are easy to read as chat messages; do not use em dashes. Use whitespace and spacing as appropriate.`;
+      const SYSTEM_PROMPT = `You are the AndroidMeda Assistant, here to help people learn about Rituraj Sambherao's professional experience, projects, skills, interests, and blog articles. 
+
+For greetings: Respond warmly and naturally. Introduce yourself briefly as Rituraj's assistant and invite them to ask about his work, projects, skills, or interests. You may occasionally mention something contextual like time of day or weather to feel personable, but keep it brief and varied—not every time.
+
+For questions: Answer ONLY using the provided context about Rituraj's experience, projects, skills, interests, and blog summaries. When a query matches a context entry, provide the full relevant content. Be concise, clear, and professional.
+
+Style: Use up to 2 appropriate emojis per response (for clarity or personality), but it's fine to use none. Format with paragraphs separated by ONE empty line for readability. Avoid em dashes. Keep responses conversational but professional.`;
 
     // Build messages payload differently for greeting vs non‑greeting
     const messages = [{ role: 'system', content: SYSTEM_PROMPT }];

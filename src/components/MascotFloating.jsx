@@ -109,6 +109,7 @@ export default function MascotFloating() {
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
     const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
     const [contextData, setContextData] = useState(null);
     const [activeSuggestions, setActiveSuggestions] = useState([
         ...getSuggestedQueries(),
@@ -149,6 +150,13 @@ export default function MascotFloating() {
             messagesEndRef.current.scrollIntoView({behavior: 'smooth', block: 'end'});
         }
     }, [messages, typing, open]);
+
+    // Auto-focus input when typing completes
+    useEffect(() => {
+        if (!typing && open && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [typing, open]);
 
     const isContextLoaded = contextData && Array.isArray(contextData) && contextData.length > 0;
 
@@ -437,6 +445,7 @@ export default function MascotFloating() {
                               className="px-5 py-4 bg-black/80 border-t border-white/10 flex flex-col gap-2">
                             <div className="flex w-full gap-2">
                                 <input
+                                    ref={inputRef}
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     type="text"
