@@ -1,6 +1,5 @@
 import { profile, skills } from '../data/cv';
 import {useEffect, useState} from 'react';
-import MascotFloating from '../components/MascotFloating.jsx';
 
 export default function Home() {
     // Code journey milestone data (loaded from JSON)
@@ -141,16 +140,52 @@ export default function Home() {
                 <div className="relative flex items-center justify-center">
                     {/* Animated Code Snippet Terminal with dino, hoops, and progress bar */}
                     <div
-                        className="h-56 w-56 max-w-[95vw] flex flex-col justify-end items-center bg-white dark:bg-black/40 rounded-3xl overflow-hidden border-2 border-cyan-500 dark:border-cyan-400 shadow-lg dark:shadow-[0_0_24px_#22d3ee,0_0_32px_#0ea5e9] ring-2 ring-cyan-400/40 dark:ring-cyan-400/20 backdrop-blur-md"
-                        style={{minHeight: '12rem'}}>
-                        {/* Hoops Row (hide at final) */}
+                        className="h-64 w-64 max-w-[95vw] flex flex-col justify-end items-center bg-white dark:bg-black/40 rounded-3xl overflow-hidden border-2 border-cyan-500 dark:border-cyan-400 shadow-lg dark:shadow-[0_0_24px_#22d3ee,0_0_32px_#0ea5e9] ring-2 ring-cyan-400/40 dark:ring-cyan-400/20 backdrop-blur-md"
+                        style={{minHeight: '14rem'}}>
+                        {/* Planets Row (hide at final) */}
                         {!showFinal && (
-                            <div className="flex justify-between items-end w-full px-5 pt-5" style={{height: '1.4rem'}}>
-                                {Array.from({length: totalMilestones}).map((_, i) => (
-                                    <span key={i}
-                                          className={`inline-block rounded-full border-[2.5px] mx-[2px] ${i < currentStep ? 'border-cyan-500 dark:border-cyan-400 bg-cyan-400/50 dark:bg-cyan-400/30' : 'border-slate-300 dark:border-cyan-900 bg-slate-200 dark:bg-cyan-950/10'} duration-200`}
-                                          style={{width: '11px', height: '11px'}}/>
-                                ))}
+                            <div className="flex justify-between items-end w-full px-5 pt-6" style={{height: '1.8rem'}}>
+                                {Array.from({length: totalMilestones}).map((_, i) => {
+                                    // Define realistic planet styles
+                                    const planets = [
+                                        { name: 'Earth', colors: 'from-blue-500 to-green-500', darkColors: 'from-blue-400 to-green-400', detail: 'bg-green-400/60', detailDark: 'bg-green-300/50' },
+                                        { name: 'Mars', colors: 'from-red-500 to-orange-600', darkColors: 'from-red-400 to-orange-500', detail: 'bg-orange-300/60', detailDark: 'bg-orange-200/50' },
+                                        { name: 'Jupiter', colors: 'from-orange-400 to-amber-600', darkColors: 'from-orange-300 to-amber-500', detail: 'bg-amber-200/60', detailDark: 'bg-amber-100/50', hasStripes: true },
+                                        { name: 'Saturn', colors: 'from-yellow-300 to-amber-400', darkColors: 'from-yellow-200 to-amber-300', detail: 'bg-yellow-100/60', detailDark: 'bg-yellow-50/50', hasRing: true },
+                                        { name: 'Venus', colors: 'from-yellow-500 to-orange-500', darkColors: 'from-yellow-400 to-orange-400', detail: 'bg-yellow-300/60', detailDark: 'bg-yellow-200/50' },
+                                    ];
+                                    const planet = planets[i % planets.length];
+                                    const isActive = i < currentStep;
+
+                                    return (
+                                        <div key={i} className="relative mx-[2px]">
+                                            {/* Planet */}
+                                            <div className={`rounded-full transition-all duration-200 relative overflow-hidden ${
+                                                isActive 
+                                                    ? `bg-gradient-to-br ${planet.colors} dark:${planet.darkColors} shadow-lg` 
+                                                    : 'bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800'
+                                            }`} style={{width: '16px', height: '16px'}}>
+                                                {/* Planet surface details */}
+                                                {isActive && (
+                                                    <>
+                                                        <div className={`absolute top-0.5 left-1 w-1.5 h-1.5 rounded-full ${planet.detail} dark:${planet.detailDark}`}></div>
+                                                        <div className={`absolute bottom-1 right-0.5 w-1 h-1 rounded-full ${planet.detail} dark:${planet.detailDark} opacity-70`}></div>
+                                                        {planet.hasStripes && (
+                                                            <>
+                                                                <div className="absolute top-1/3 left-0 right-0 h-[1px] bg-white/20"></div>
+                                                                <div className="absolute top-2/3 left-0 right-0 h-[1px] bg-white/20"></div>
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
+                                            {/* Saturn's ring */}
+                                            {isActive && planet.hasRing && (
+                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-[2px] rounded-full bg-gradient-to-r from-transparent via-amber-300/50 dark:via-amber-200/40 to-transparent transform -rotate-12"></div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                         {/* Progress Bar (hide at final) */}
@@ -163,64 +198,129 @@ export default function Home() {
                         )}
                         {/* Dino Row */}
                         <div className="relative flex items-end justify-center w-full flex-col flex-1">
-                            {/* Moving Dino (final state: center vertically) */}
+                            {/* Moving Spaceship (final state: center vertically) */}
                             {!showFinal ? (
                                 <div
-                                    className={`absolute bottom-0 duration-200 transition-all dino-side-walk`} style={{
-                                    left: `calc(${progressPercent}% - 18px)`,
+                                    className={`absolute bottom-2 duration-200 transition-all spaceship-hover`} style={{
+                                    left: `calc(${progressPercent}% - 30px)`,
                                     transitionTimingFunction: 'cubic-bezier(.55,1.55,.4,1)'
                                 }}>
-                                    {/* 8-bit sideways dino SVG with natural movements */}
-                                    <svg width="36" height="28" viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg">
-                                        <rect width="40" height="34" rx="6" className="fill-slate-100 dark:fill-[#171a22]"/>
-                                        {/* Body - subtle breathing */}
-                                        <g className="dino-body-breathe">
-                                            <rect x="6" y="18" width="8" height="4" className="fill-cyan-300 dark:fill-[#aef9fb]"/>
-                                            <rect x="14" y="14" width="14" height="8" className="fill-cyan-400 dark:fill-[#71e0ed]"/>
-                                            <rect x="28" y="18" width="6" height="4" className="fill-cyan-500 dark:fill-[#58c2e8]"/>
-                                            <rect x="22" y="10" width="6" height="12" className="fill-cyan-600 dark:fill-[#29a8dd]"/>
-                                            <rect x="16" y="22" width="10" height="6" className="fill-cyan-500 dark:fill-[#23bcbc]"/>
+                                    {/* Spaceship SVG - side view */}
+                                    <svg width="60" height="50" viewBox="0 0 44 36" xmlns="http://www.w3.org/2000/svg">
+                                        {/* Exhaust flame - animated */}
+                                        <g className="spaceship-flame">
+                                            <ellipse cx="6" cy="18" rx="4" ry="2.5" className="fill-orange-400 dark:fill-orange-300" opacity="0.8"/>
+                                            <ellipse cx="4" cy="18" rx="3" ry="2" className="fill-yellow-400 dark:fill-yellow-300" opacity="0.9"/>
                                         </g>
-                                        {/* Head - subtle tilt */}
-                                        <g className="dino-head-tilt">
-                                            <rect x="18" y="6" width="10" height="8" className="fill-cyan-400 dark:fill-[#2ec2c9]"/>
-                                            {/* Eye with blink */}
-                                            <rect x="24" y="13" width="2" height="2" className="fill-slate-800 dark:fill-[#161c21] dino-eye-blink"/>
+                                        {/* Main body */}
+                                        <ellipse cx="24" cy="18" rx="12" ry="6" className="fill-slate-200 dark:fill-slate-300"/>
+                                        {/* Cockpit window */}
+                                        <ellipse cx="28" cy="16" rx="4" ry="3" className="fill-sky-400 dark:fill-sky-300" opacity="0.8"/>
+                                        <ellipse cx="28" cy="16" rx="2.5" ry="2" className="fill-slate-800 dark:fill-slate-900" opacity="0.3"/>
+                                        {/* Nose cone */}
+                                        <path d="M36 18 L40 16 L40 20 Z" className="fill-cyan-500 dark:fill-cyan-400"/>
+                                        {/* Wings */}
+                                        <g className="spaceship-wing-tilt">
+                                            <path d="M20 12 L22 8 L26 12 Z" className="fill-cyan-500 dark:fill-cyan-400"/>
+                                            <path d="M20 24 L22 28 L26 24 Z" className="fill-cyan-500 dark:fill-cyan-400"/>
                                         </g>
-                                        {/* Feather/crest details - subtle wave */}
-                                        <g className="dino-feather-wave">
-                                            <rect x="20" y="4" width="2" height="3" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.7"/>
-                                            <rect x="23" y="3" width="2" height="4" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.8"/>
-                                            <rect x="26" y="4" width="2" height="3" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.7"/>
-                                        </g>
+                                        {/* Details/panels */}
+                                        <rect x="16" y="17" width="12" height="0.5" className="fill-slate-400 dark:fill-slate-500" opacity="0.5"/>
+                                        <circle cx="18" cy="18" r="0.8" className="fill-cyan-400 dark:fill-cyan-300" opacity="0.6"/>
+                                        <circle cx="22" cy="18" r="0.8" className="fill-cyan-400 dark:fill-cyan-300" opacity="0.6"/>
                                     </svg>
                                 </div>
                             ) : (
                                 <div
-                                    className="w-full flex items-center flex-col justify-center duration-300 dino-final-idle"
-                                    style={{transform: 'scale(2.5)', transition: 'transform 0.7s'}}
+                                    className="w-full flex items-center flex-col justify-center duration-300 falcon-hover"
+                                    style={{transform: 'scale(6.4)', transition: 'transform 0.7s', marginTop: '2rem'}}
                                 >
-                                    {/* Front-facing dino with natural movements */}
-                                    <svg width="36" height="48" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
-                                        {/* Head with subtle bob */}
-                                        <g className="dino-head-bob">
-                                            <rect x="11" y="2" width="14" height="10" rx="3" className="fill-cyan-400 dark:fill-[#43e2d5]"/>
-                                            <rect x="14" y="9" width="8" height="3" className="fill-cyan-500 dark:fill-[#23bcbc]"/>
-                                            {/* Eyes with blink */}
-                                            <rect x="15" y="7" width="2" height="2" className="fill-slate-800 dark:fill-[#161c21] dino-eye-blink"/>
-                                            <rect x="19" y="7" width="2" height="2" className="fill-slate-800 dark:fill-[#161c21] dino-eye-blink"/>
-                                            {/* Crest feathers - wave animation */}
-                                            <g className="dino-crest-wave">
-                                                <rect x="13" y="0" width="2" height="3" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.6"/>
-                                                <rect x="17" y="-1" width="2" height="4" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.8"/>
-                                                <rect x="21" y="0" width="2" height="3" className="fill-cyan-400 dark:fill-[#43e2d5]" opacity="0.6"/>
-                                            </g>
+                                    {/* Millennium Falcon inspired spaceship - top-down view */}
+                                    <svg width="96" height="96" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_12px_rgba(6,182,212,0.5)] dark:drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15)) drop-shadow(0 0 12px rgba(6,182,212,0.5))'}}>
+                                        {/* Main disc body */}
+                                        <g className="falcon-body-tilt">
+                                            {/* Outer hull with border */}
+                                            <ellipse cx="28" cy="30" rx="20.5" ry="16.5" className="fill-none stroke-slate-400 dark:stroke-slate-500" strokeWidth="1"/>
+                                            <ellipse cx="28" cy="30" rx="20" ry="16" className="fill-slate-300 dark:fill-slate-400"/>
+
+                                            {/* Panel details */}
+                                            <ellipse cx="28" cy="30" rx="16" ry="12" className="fill-slate-200 dark:fill-slate-300"/>
+
+                                            {/* Center circle detail */}
+                                            <circle cx="28" cy="30" r="6" className="fill-slate-400 dark:fill-slate-500"/>
+                                            <circle cx="28" cy="30" r="4" className="fill-slate-300 dark:fill-slate-400"/>
+
+                                            {/* Panel lines */}
+                                            <rect x="12" y="29" width="32" height="1" className="fill-slate-400 dark:fill-slate-500" opacity="0.5"/>
+                                            <rect x="27" y="16" width="2" height="28" className="fill-slate-400 dark:fill-slate-500" opacity="0.5"/>
+
+                                            {/* Side details */}
+                                            <circle cx="16" cy="26" r="2" className="fill-slate-400 dark:fill-slate-500" opacity="0.7"/>
+                                            <circle cx="40" cy="26" r="2" className="fill-slate-400 dark:fill-slate-500" opacity="0.7"/>
+                                            <circle cx="16" cy="34" r="2" className="fill-slate-400 dark:fill-slate-500" opacity="0.7"/>
+                                            <circle cx="40" cy="34" r="2" className="fill-slate-400 dark:fill-slate-500" opacity="0.7"/>
                                         </g>
-                                        {/* Body with breathing */}
-                                        <g className="dino-body-breathe">
-                                            <rect x="7" y="12" width="22" height="17" rx="4" className="fill-cyan-300 dark:fill-[#6df6ed]"/>
-                                            <rect x="14" y="29" width="8" height="12" rx="2" className="fill-cyan-600 dark:fill-[#20a7c6]"/>
-                                            <rect x="8" y="38" width="20" height="7" rx="3" className="fill-cyan-400 dark:fill-[#2ed2c9]"/>
+
+                                        {/* Offset cockpit (distinctive Falcon feature) */}
+                                        <g className="falcon-cockpit-glow">
+                                            <ellipse cx="38" cy="26" rx="5" ry="4" className="fill-cyan-500 dark:fill-cyan-400"/>
+                                            <ellipse cx="38" cy="26" rx="3.5" ry="3" className="fill-sky-300 dark:fill-sky-200" opacity="0.8"/>
+                                            <ellipse cx="38" cy="26" rx="2" ry="1.5" className="fill-cyan-200 dark:fill-cyan-100">
+                                                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                        </g>
+
+                                        {/* Front mandibles/prongs */}
+                                        <g className="falcon-mandibles">
+                                            {/* Left prong */}
+                                            <path d="M 20 18 L 16 12 L 18 10 L 22 16 Z" className="fill-slate-300 dark:fill-slate-400"/>
+                                            <rect x="17" y="11" width="3" height="6" className="fill-slate-400 dark:fill-slate-500" opacity="0.5"/>
+
+                                            {/* Right prong */}
+                                            <path d="M 36 18 L 40 12 L 38 10 L 34 16 Z" className="fill-slate-300 dark:fill-slate-400"/>
+                                            <rect x="36" y="11" width="3" height="6" className="fill-slate-400 dark:fill-slate-500" opacity="0.5"/>
+
+                                            {/* Center gap details */}
+                                            <rect x="24" y="12" width="8" height="4" className="fill-slate-500 dark:fill-slate-600" opacity="0.6"/>
+                                        </g>
+
+                                        {/* Engine thrusters at back with enhanced afterburn */}
+                                        <g className="falcon-thrusters">
+                                            {/* Left engine */}
+                                            <rect x="14" y="44" width="6" height="4" rx="1" className="fill-slate-400 dark:fill-slate-500"/>
+                                            {/* Afterburn layers - multiple colors for realistic engine glow */}
+                                            <ellipse cx="17" cy="51" rx="3.5" ry="4" className="fill-cyan-300 dark:fill-cyan-200" opacity="0.7">
+                                                <animate attributeName="ry" values="4;6;4" dur="0.6s" repeatCount="indefinite"/>
+                                                <animate attributeName="opacity" values="0.7;0.9;0.7" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                            <ellipse cx="17" cy="50" rx="3" ry="3" className="fill-blue-300 dark:fill-blue-200" opacity="0.8">
+                                                <animate attributeName="ry" values="3;4.5;3" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                            <ellipse cx="17" cy="48.5" rx="2.5" ry="2" className="fill-white" opacity="0.9">
+                                                <animate attributeName="ry" values="2;3;2" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+
+                                            {/* Right engine */}
+                                            <rect x="36" y="44" width="6" height="4" rx="1" className="fill-slate-400 dark:fill-slate-500"/>
+                                            {/* Afterburn layers - multiple colors for realistic engine glow */}
+                                            <ellipse cx="39" cy="51" rx="3.5" ry="4" className="fill-cyan-300 dark:fill-cyan-200" opacity="0.7">
+                                                <animate attributeName="ry" values="4;6;4" dur="0.6s" repeatCount="indefinite"/>
+                                                <animate attributeName="opacity" values="0.7;0.9;0.7" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                            <ellipse cx="39" cy="50" rx="3" ry="3" className="fill-blue-300 dark:fill-blue-200" opacity="0.8">
+                                                <animate attributeName="ry" values="3;4.5;3" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                            <ellipse cx="39" cy="48.5" rx="2.5" ry="2" className="fill-white" opacity="0.9">
+                                                <animate attributeName="ry" values="2;3;2" dur="0.6s" repeatCount="indefinite"/>
+                                            </ellipse>
+                                        </g>
+
+                                        {/* Sensor dish (iconic Falcon feature) */}
+                                        <g className="falcon-dish-spin">
+                                            <circle cx="22" cy="30" r="3" className="fill-slate-400 dark:fill-slate-500" opacity="0.8"/>
+                                            <circle cx="22" cy="30" r="2" className="fill-cyan-400 dark:fill-cyan-300" opacity="0.6">
+                                                <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+                                            </circle>
                                         </g>
                                     </svg>
                                 </div>
@@ -298,56 +398,98 @@ export default function Home() {
           animation: blink-slow 1.65s infinite linear;
         }
         
-        /* Natural dino animations */
-        @keyframes dino-breathe {
+        /* Spaceship and Robot animations */
+        @keyframes spaceship-hover {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        @keyframes spaceship-flame {
+          0%, 100% { transform: scaleY(1); opacity: 0.8; }
+          50% { transform: scaleY(1.3); opacity: 1; }
+        }
+        @keyframes spaceship-wing-tilt {
+          0%, 100% { transform: rotate(0deg); }
+          50% { transform: rotate(-2deg); }
+        }
+        @keyframes robot-breathe {
           0%, 100% { transform: scale(1, 1); }
           50% { transform: scale(1.02, 0.98); }
         }
-        @keyframes dino-head-tilt {
-          0%, 100% { transform: rotate(0deg) translateY(0); }
-          25% { transform: rotate(-1deg) translateY(-0.5px); }
-          75% { transform: rotate(1deg) translateY(0.5px); }
-        }
-        @keyframes dino-head-bob {
+        @keyframes robot-head-bob {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-1.5px); }
+          50% { transform: translateY(-2px); }
         }
-        @keyframes dino-feather-wave {
-          0%, 100% { transform: translateY(0) scaleY(1); }
-          33% { transform: translateY(-1px) scaleY(1.1); }
-          66% { transform: translateY(0.5px) scaleY(0.95); }
+        @keyframes robot-arm-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-1px); }
         }
-        @keyframes dino-crest-wave {
-          0%, 100% { transform: translateY(0) scaleY(1); }
-          50% { transform: translateY(-2px) scaleY(1.15); }
+        @keyframes robot-eye-blink {
+          0%, 90%, 100% { opacity: 1; }
+          93%, 97% { opacity: 0.2; }
         }
-        @keyframes dino-eye-blink {
-          0%, 90%, 100% { opacity: 1; transform: scaleY(1); }
-          93%, 97% { opacity: 0.1; transform: scaleY(0.1); }
+        @keyframes antenna-bob {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-1px) rotate(-3deg); }
+          75% { transform: translateY(1px) rotate(3deg); }
         }
         
-        .dino-body-breathe {
-          animation: dino-breathe 3.2s ease-in-out infinite;
+        .spaceship-hover {
+          animation: spaceship-hover 2s ease-in-out infinite;
+        }
+        .spaceship-flame {
+          animation: spaceship-flame 0.5s ease-in-out infinite;
           transform-origin: center;
         }
-        .dino-head-tilt {
-          animation: dino-head-tilt 4.5s ease-in-out infinite;
+        .spaceship-wing-tilt {
+          animation: spaceship-wing-tilt 3s ease-in-out infinite;
           transform-origin: center;
         }
-        .dino-head-bob {
-          animation: dino-head-bob 2.8s ease-in-out infinite;
+        .robot-body-breathe {
+          animation: robot-breathe 3s ease-in-out infinite;
+          transform-origin: center;
+        }
+        .robot-head-bob {
+          animation: robot-head-bob 2.5s ease-in-out infinite;
           transform-origin: center bottom;
         }
-        .dino-feather-wave {
-          animation: dino-feather-wave 2.5s ease-in-out infinite;
+        .robot-arm-float {
+          animation: robot-arm-float 2s ease-in-out infinite;
+        }
+        .robot-eye-blink {
+          animation: robot-eye-blink 5s ease-in-out infinite;
+        }
+        .antenna-bob {
+          animation: antenna-bob 3s ease-in-out infinite;
           transform-origin: center bottom;
         }
-        .dino-crest-wave {
-          animation: dino-crest-wave 3s ease-in-out infinite;
-          transform-origin: center bottom;
+        .robot-idle {
+          animation: spaceship-hover 3s ease-in-out infinite;
         }
-        .dino-eye-blink {
-          animation: dino-eye-blink 5s ease-in-out infinite;
+        
+        /* Millennium Falcon animations */
+        @keyframes falcon-hover {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes falcon-body-tilt {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-1deg); }
+          75% { transform: rotate(1deg); }
+        }
+        @keyframes falcon-dish-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .falcon-hover {
+          animation: falcon-hover 3s ease-in-out infinite;
+        }
+        .falcon-body-tilt {
+          animation: falcon-body-tilt 4s ease-in-out infinite;
+          transform-origin: center;
+        }
+        .falcon-dish-spin {
+          animation: falcon-dish-spin 6s linear infinite;
           transform-origin: center;
         }
       `}</style>
