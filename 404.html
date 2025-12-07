@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting…</title>
+    <meta http-equiv="refresh" content="0; url=/"/>
+    <script>
+        // GitHub Pages SPA Redirect
+        (function () {
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var hash = window.location.hash;
+            var redirectTo = '/index.html';
+            // For non-root custom domain deploys, you may need to replace '/' above with the repo name (e.g. '/your-repo-name/')
+            // If deploying to a subfolder, ensure redirectTo points to the correct path.
+            if (path !== '/' && !path.match(/^\/404.html/)) {
+                // Only redirect if not already at /
+                window.sessionStorage.setItem('redirectPath', path + search + hash);
+                window.location.replace(redirectTo);
+            }
+            // After index.html loads, push back the real URL (for user/SPA router)
+            if (window.sessionStorage.getItem('redirectPath')) {
+                var realUrl = window.sessionStorage.getItem('redirectPath');
+                window.sessionStorage.removeItem('redirectPath');
+                if (realUrl !== window.location.pathname + window.location.search + window.location.hash) {
+                    window.history.replaceState({}, '', realUrl);
+                }
+            }
+        })();
+    </script>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, sans-serif;
+            background: #111827;
+            color: #eee;
+        }
+    </style>
+</head>
+<body>
+<h1>Redirecting…</h1>
+<p>If you are not redirected automatically, <a href="/">go to the home page</a>.</p>
+</body>
+</html>
+
