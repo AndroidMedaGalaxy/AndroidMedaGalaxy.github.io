@@ -8,11 +8,12 @@ import Contact from './pages/Contact.jsx';
 import Projects from './pages/Projects.jsx';
 import Interests from './pages/Interests.jsx';
 import MascotFloating from './components/MascotFloating.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 function AppInner() {
     const location = useLocation();
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-50">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
             <Navbar/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
@@ -31,7 +32,9 @@ function AppInner() {
 export default function App() {
     return (
         <BrowserRouter>
-            <AppInner/>
+            <ThemeProvider>
+                <AppInner/>
+            </ThemeProvider>
         </BrowserRouter>
     );
 }

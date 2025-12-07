@@ -26,20 +26,20 @@ export default function Articles() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-12 pt-8">
-      <h1 className="text-3xl font-bold text-slate-50">Articles</h1>
-      <p className="mt-2 max-w-2xl text-sm text-slate-300">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Articles</h1>
+      <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
         A feed of my latest writing from Medium. This updates automatically via the public RSS feed.
       </p>
 
       {state === 'loading' && (
-        <p className="mt-6 text-sm text-slate-400">Loading Medium feed…</p>
+        <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">Loading Medium feed…</p>
       )}
 
       {state === 'error' && (
-        <p className="mt-6 text-sm text-rose-300">
+        <p className="mt-6 text-sm text-rose-600 dark:text-rose-300">
           Couldn&apos;t load the Medium feed. Double-check the username in{' '}
-          <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">MEDIUM_USERNAME</code> in
-          <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">src/pages/Articles.jsx</code>.
+          <code className="rounded bg-slate-200 dark:bg-slate-800 px-1 py-0.5 text-xs">MEDIUM_USERNAME</code> in
+          <code className="rounded bg-slate-200 dark:bg-slate-800 px-1 py-0.5 text-xs">src/pages/Articles.jsx</code>.
         </p>
       )}
 
