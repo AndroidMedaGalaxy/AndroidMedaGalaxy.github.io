@@ -3,6 +3,7 @@ import {motion, AnimatePresence} from 'framer-motion';
 import {generateResponseOpenAI, getSuggestedQueries} from '../utils/openai';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import {soundEffects} from '../utils/soundEffects';
 
 // Mascot image path
 const mascotImg = import.meta.env.BASE_URL + 'images/droidmeda/mascot_jetpack_flipped_transparent_light.png';
@@ -35,7 +36,7 @@ function ChatBubble({role, text, timestamp, type, file}) {
                 <a
                     href={file}
                     download="Rituraj_Sambherao_CV.pdf"
-                    className="download-btn px-5 py-2.5 rounded-md text-[#0A66C2] bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold border-2 border-[#0A66C2] shadow-md hover:shadow-lg transition-colors duration-200 flex items-center gap-2"
+                    className="download-btn px-5 py-2.5 rounded-md text-[#0A66C2] dark:text-white bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold border-2 border-[#0A66C2] dark:border-cyan-400 shadow-md hover:shadow-lg transition-colors duration-200 flex items-center gap-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -71,16 +72,16 @@ function ChatBubble({role, text, timestamp, type, file}) {
             </div>
             {isUser && (
                 <span
-                    className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-cyan-500 dark:border-neon-blue shadow-lg dark:shadow-[0_0_14px_#22d3ee,0_0_16px_#0ea5e9] ml-2 bg-cyan-50 dark:bg-black/60 flex-shrink-0">
+                    className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-cyan-600 dark:border-cyan-400 shadow-lg dark:shadow-[0_0_14px_#22d3ee,0_0_16px_#0ea5e9] ml-2 bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-500/20 dark:to-blue-500/20 dark:bg-black/60 flex-shrink-0">
                     {/* 8-bit or emoji face SVG */}
-                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <circle cx="13" cy="13" r="12" fill="#293347" stroke="#22d3ee" strokeWidth="1.5"/>
-                        <ellipse cx="9.5" cy="10.6" rx="1" ry="1.5" fill="#fff"/>
-                        <ellipse cx="16.5" cy="10.6" rx="1" ry="1.5" fill="#fff"/>
-                        <ellipse cx="9.5" cy="10.8" rx=".45" ry=".6" fill="#1e293b"/>
-                        <ellipse cx="16.5" cy="10.8" rx=".45" ry=".6" fill="#1e293b"/>
-                        <path d="M9.8 16c.7 1.2 5.7 1.2 6.4 0" stroke="#27e2ea" strokeWidth="1.1"
-                              strokeLinecap="round"/>
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" className="dark:[&_circle]:fill-[#293347] [&_circle]:fill-white">
+                        <circle cx="13" cy="13" r="12" stroke="currentColor" strokeWidth="1.5" className="text-cyan-600 dark:text-cyan-400"/>
+                        <ellipse cx="9.5" cy="10.6" rx="1" ry="1.5" className="fill-slate-700 dark:fill-white"/>
+                        <ellipse cx="16.5" cy="10.6" rx="1" ry="1.5" className="fill-slate-700 dark:fill-white"/>
+                        <ellipse cx="9.5" cy="10.8" rx=".45" ry=".6" className="fill-slate-900 dark:fill-slate-900"/>
+                        <ellipse cx="16.5" cy="10.8" rx=".45" ry=".6" className="fill-slate-900 dark:fill-slate-900"/>
+                        <path d="M9.8 16c.7 1.2 5.7 1.2 6.4 0" stroke="currentColor" strokeWidth="1.1"
+                              strokeLinecap="round" className="text-cyan-700 dark:text-cyan-400"/>
                     </svg>
                 </span>
             )}
@@ -108,11 +109,36 @@ function TypingIndicator() {
 
 export default function MascotFloating() {
     const [open, setOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        {role: 'assistant', text: 'Hello! How can I help you today?', timestamp: new Date()},
-    ]);
+    const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
+    const [initialLoad, setInitialLoad] = useState(true);
+
+    // Initialize sound effects and show initial greeting with typing animation
+    useEffect(() => {
+        if (open && initialLoad) {
+            soundEffects.init();
+
+            // Show typing indicator
+            setTyping(true);
+
+            // Simulate loading/typing for 1.2 seconds before showing greeting
+            const timer = setTimeout(() => {
+                setMessages([{
+                    role: 'assistant',
+                    text: 'Hello! How can I help you today?',
+                    timestamp: new Date()
+                }]);
+                setTyping(false);
+                setInitialLoad(false);
+
+                // Play sound when greeting appears
+                soundEffects.playAIResponse();
+            }, 1200);
+
+            return () => clearTimeout(timer);
+        }
+    }, [open, initialLoad]);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const [contextData, setContextData] = useState(null);
@@ -193,9 +219,13 @@ export default function MascotFloating() {
                 text: "You can download Rituraj's CV below.",
                 file: "/assets/Rituraj_Sambherao_CV.pdf"
             }]);
+            // Play cyberpunk notification sound
+            soundEffects.playAIResponse();
             return;
         }
         setMessages(msgs => [...msgs, {role: 'assistant', text: respText, timestamp: new Date()}]);
+        // Play cyberpunk notification sound for AI response
+        soundEffects.playAIResponse();
     }
 
     function handleSuggestionClick(sugg) {

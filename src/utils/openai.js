@@ -5,7 +5,7 @@
 // Suggested query prompts for quick access
 export function getSuggestedQueries() {
     return [
-        "Say hi to the assistant",
+        "Hello there",
         "About Rituraj Sambherao",
         "Rituraj's experience",
         "Skills and technologies he uses",
