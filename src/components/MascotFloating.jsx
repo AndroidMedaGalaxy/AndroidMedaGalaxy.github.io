@@ -30,13 +30,18 @@ function ChatBubble({role, text, timestamp, type, file}) {
     if (type === "cv-download") {
         return (
             <div
-                className="cv-download-tile flex flex-col items-start p-4 my-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-400 shadow-md border-2 border-purple-400">
-                <p className="mb-2 text-white font-semibold">{text}</p>
+                className="cv-download-tile flex flex-col items-start p-4 my-3 rounded-xl bg-white dark:bg-slate-800 shadow-md border-2 border-[#0A66C2]">
+                <p className="mb-2 text-slate-700 dark:text-slate-200 font-semibold">{text}</p>
                 <a
                     href={file}
                     download="Rituraj_Sambherao_CV.pdf"
-                    className="download-btn px-4 py-2 rounded-full bg-black/80 text-white font-semibold border border-cyan-400 shadow-lg hover:bg-cyan-700 hover:text-white transition drop-shadow"
+                    className="download-btn px-5 py-2.5 rounded-md text-[#0A66C2] bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold border-2 border-[#0A66C2] shadow-md hover:shadow-lg transition-colors duration-200 flex items-center gap-2"
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
                     Download CV
                 </a>
             </div>
@@ -51,12 +56,12 @@ function ChatBubble({role, text, timestamp, type, file}) {
         >
             {isAssistant && (
                 <img src={mascotImg} alt="Assistant"
-                     className="w-8 h-8 rounded-full shadow-[0_0_10px_#a855f7,0_0_8px_#0ea5e9] bg-black/70 border-2 border-purple-500 ml-2 flex-shrink-0"/>
+                     className="w-8 h-8 rounded-full shadow-lg dark:shadow-[0_0_10px_#a855f7,0_0_8px_#0ea5e9] bg-white dark:bg-black/70 border-2 border-purple-400 dark:border-purple-500 ml-2 flex-shrink-0"/>
             )}
-            <div className={`relative px-4 py-2 rounded-xl text-white text-base ml-1 ${
+            <div className={`relative px-4 py-2 rounded-xl text-base ml-1 ${
                 isAssistant
-                    ? 'bg-black/70 border border-gradient-to-r from-purple-500 to-cyan-400 shadow-[0_0_12px_#a855f7]/30'
-                    : 'bg-black/50 border border-cyan-400 shadow-lg'
+                    ? 'bg-purple-100 dark:bg-black/70 text-slate-900 dark:text-white border border-purple-300 dark:border-purple-500 shadow-md dark:shadow-[0_0_12px_#a855f7]/30'
+                    : 'bg-cyan-100 dark:bg-black/50 text-slate-900 dark:text-white border border-cyan-400 shadow-md dark:shadow-lg'
             }`}>
                 {isAssistant ? (
                     <MarkdownWithSpacing>{text}</MarkdownWithSpacing>
@@ -66,7 +71,7 @@ function ChatBubble({role, text, timestamp, type, file}) {
             </div>
             {isUser && (
                 <span
-                    className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-neon-blue shadow-[0_0_14px_#22d3ee,0_0_16px_#0ea5e9] ml-2 bg-black/60 flex-shrink-0">
+                    className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-cyan-500 dark:border-neon-blue shadow-lg dark:shadow-[0_0_14px_#22d3ee,0_0_16px_#0ea5e9] ml-2 bg-cyan-50 dark:bg-black/60 flex-shrink-0">
                     {/* 8-bit or emoji face SVG */}
                     <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
                         <circle cx="13" cy="13" r="12" fill="#293347" stroke="#22d3ee" strokeWidth="1.5"/>
@@ -88,10 +93,10 @@ function TypingIndicator() {
     return (
         <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className="flex items-center gap-2 mb-2 ml-2">
             <img src={mascotImg} alt="Assistant"
-                 className="w-8 h-8 rounded-full shadow-[0_0_10px_#a855f7,0_0_8px_#0ea5e9] bg-black/70 border-2 border-purple-500"/>
+                 className="w-8 h-8 rounded-full shadow-lg dark:shadow-[0_0_10px_#a855f7,0_0_8px_#0ea5e9] bg-white dark:bg-black/70 border-2 border-purple-400 dark:border-purple-500"/>
             <span className="flex gap-1">
         {[0, 1, 2].map(i => (
-            <motion.span key={i} className="inline-block w-2 h-2 bg-purple-500 rounded-full"
+            <motion.span key={i} className="inline-block w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"
                          animate={{y: [0, -5, 0], opacity: [1, 0.6, 1]}}
                          transition={{duration: 0.8, repeat: Infinity, repeatDelay: 0.2, delay: i * 0.2}}/>
         ))}
@@ -217,12 +222,15 @@ export default function MascotFloating() {
                 {!open && (
                     <motion.button
                         initial={false}
-                        animate={{scale: mascotScale, boxShadow: "0 0 18px #22d3ee, 0 0 36px #0ea5e9"}}
-                        whileHover={{scale: 1.14, boxShadow: "0 0 50px #22d3ee, 0 0 56px #0ea5e9"}}
+                        animate={{scale: mascotScale}}
+                        whileHover={{scale: 1.14}}
                         exit={{opacity: 0, scale: 0.7, y: 24}}
                         transition={{type: "spring", stiffness: 530, damping: 30}}
-                        className="fixed bottom-24 right-10 z-[51] w-20 h-20 rounded-full shadow-xl border-[2.5px] border-transparent flex items-center justify-center bg-black/20 transition-all overflow-visible"
-                        style={{pointerEvents: 'auto'}}
+                        className="fixed bottom-24 right-10 z-[51] w-20 h-20 rounded-full shadow-2xl border-[3px] border-cyan-400 dark:border-cyan-400 flex items-center justify-center bg-gradient-to-br from-purple-100 to-cyan-100 dark:from-purple-900/40 dark:to-cyan-900/40 hover:from-purple-200 hover:to-cyan-200 dark:hover:from-purple-800/50 dark:hover:to-cyan-800/50 transition-all overflow-visible ring-4 ring-cyan-300/30 dark:ring-cyan-400/20"
+                        style={{
+                            pointerEvents: 'auto',
+                            boxShadow: '0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(14, 165, 233, 0.3), 0 10px 30px rgba(0, 0, 0, 0.2)'
+                        }}
                         aria-label={open ? "Hide Chat" : "Open chat"}
                         onClick={() => setOpen(true)}
                     >
@@ -367,8 +375,11 @@ export default function MascotFloating() {
                             alt="DroidMeda Mascot"
                             width={68}
                             height={68}
-                            className="object-contain drop-shadow-xl relative z-50"
-                            style={{pointerEvents: 'none'}}
+                            className="object-contain relative z-50"
+                            style={{
+                                pointerEvents: 'none',
+                                filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 8px rgba(34, 211, 238, 0.4))'
+                            }}
                         />
                     </motion.button>
                 )}
@@ -383,22 +394,22 @@ export default function MascotFloating() {
                         animate={{opacity: 1, y: 0, scale: 1}}
                         exit={{opacity: 0, y: 40, scale: 0.96}}
                         transition={{type: "spring", stiffness: 330, damping: 30}}
-                        className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[96vw] h-[640px] rounded-[20px] shadow-2xl border border-transparent overflow-hidden backdrop-blur-md flex flex-col"
+                        className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[96vw] h-[640px] rounded-[20px] shadow-2xl border border-slate-300 dark:border-transparent bg-gradient-to-br from-purple-100 via-cyan-50 to-blue-100 dark:from-purple-900/40 dark:via-slate-900/60 dark:to-blue-900/40 overflow-hidden backdrop-blur-md flex flex-col"
                     >
                         {/* Mascot + Name in Header */}
                         <div
-                            className="relative h-20 sm:h-24 rounded-t-[18px] sm:rounded-t-[20px] border-b border-white/10 flex items-center px-3 sm:px-6"
+                            className="relative h-20 sm:h-24 rounded-t-[18px] sm:rounded-t-[20px] border-b border-slate-300 dark:border-white/10 bg-gradient-to-r from-purple-200 via-cyan-100 to-blue-200 dark:from-purple-900/60 dark:via-slate-900/80 dark:to-blue-900/60 flex items-center px-3 sm:px-6"
                         >
                             <span className="flex items-center gap-4 z-10">
                                 <img
                                     src={mascotImg}
                                     alt="AndroidMeda Mascot"
-                                    className="w-14 h-14 rounded-full shadow-[0_0_22px_#a855f7,0_0_20px_#0ea5e9] bg-black/30 border-2 border-purple-500"
+                                    className="w-14 h-14 rounded-full shadow-lg dark:shadow-[0_0_22px_#a855f7,0_0_20px_#0ea5e9] bg-white dark:bg-black/30 border-2 border-purple-400 dark:border-purple-500"
                                 />
                                 <span className="flex flex-col">
-                                    <span className="font-bold text-white text-lg md:text-xl drop-shadow-md">Ask me anything</span>
+                                    <span className="font-bold text-slate-900 dark:text-white text-lg md:text-xl drop-shadow-sm">Ask me anything</span>
                                     <span
-                                        className="text-xs md:text-sm text-white/90">…as long as it's about Rituraj!</span>
+                                        className="text-xs md:text-sm text-slate-700 dark:text-white/90">…as long as it's about Rituraj!</span>
                                 </span>
                             </span>
                             {/* Subtle stars -- minimal for visual */}
@@ -418,11 +429,11 @@ export default function MascotFloating() {
                             </span>
                             <button
                                 onClick={() => setOpen(false)}
-                                className="ml-auto z-10 bg-black/30 hover:bg-white/10 p-2 rounded-full transition"
+                                className="ml-auto z-10 bg-slate-200 dark:bg-black/30 hover:bg-slate-300 dark:hover:bg-white/10 p-2 rounded-full transition"
                                 aria-label="Close Chat"
                             >
                                 <svg width={22} height={22} viewBox="0 0 22 22">
-                                    <path d="M6 6l10 10M16 6L6 16" stroke="#fff" strokeWidth={2} strokeLinecap="round"/>
+                                    <path d="M6 6l10 10M16 6L6 16" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="text-slate-700 dark:text-white"/>
                                 </svg>
                             </button>
                         </div>
@@ -432,7 +443,7 @@ export default function MascotFloating() {
                             style={{scrollBehavior: 'smooth'}}
                         >
                             <div
-                                className="flex flex-col gap-2 px-5 py-6 bg-black/60 backdrop-blur-lg h-full overflow-y-auto">
+                                className="flex flex-col gap-2 px-5 py-6 bg-white/80 dark:bg-black/60 backdrop-blur-lg h-full overflow-y-auto">
                                 {messages.map((msg, idx) => (
                                     <ChatBubble {...msg} key={idx}/>
                                 ))}
@@ -442,7 +453,7 @@ export default function MascotFloating() {
                         </div>
                         {/* Input Bar */}
                         <form onSubmit={sendMessage}
-                              className="px-5 py-4 bg-black/80 border-t border-white/10 flex flex-col gap-2">
+                              className="px-5 py-4 bg-slate-100 dark:bg-black/80 border-t border-slate-300 dark:border-white/10 flex flex-col gap-2">
                             <div className="flex w-full gap-2">
                                 <input
                                     ref={inputRef}
@@ -450,20 +461,18 @@ export default function MascotFloating() {
                                     onChange={e => setInput(e.target.value)}
                                     type="text"
                                     placeholder={typing ? 'Responding. Please wait…' : 'Type your message…'}
-                                    className="flex-grow bg-black/40 border border-transparent rounded-full px-5 py-2 text-white placeholder:text-white/50 outline-none transition focus:border-purple-500 shadow-sm focus:shadow-purple-500/50"
+                                    className="flex-grow bg-white dark:bg-black/40 border border-slate-300 dark:border-transparent rounded-full px-5 py-2 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-white/50 outline-none transition focus:border-purple-500 shadow-sm focus:shadow-purple-500/50"
                                     autoFocus={open}
                                     disabled={typing}
                                 />
                                 <button
                                     type="submit"
-                                    className="rounded-full p-3 text-xl shadow-[0_0_16px_#22d3ee,0_0_32px_#0ea5e9] bg-black/20 border-2 border-cyan-400 transition hover:scale-105 active:scale-95"
-                                    style={{boxShadow: "0 0 22px #22d3ee, 0 0 40px #0ea5e9"}}
+                                    className="rounded-full p-3 text-xl shadow-lg bg-cyan-500 dark:bg-black/20 border-2 border-cyan-600 dark:border-cyan-400 transition hover:scale-105 active:scale-95 hover:bg-cyan-600 dark:hover:bg-cyan-500/20"
                                     aria-label="Send"
                                     disabled={typing}
                                 >
-                                    <svg width="24" height="24" fill="none"
-                                         style={{filter: "drop-shadow(0 0 8px #22d3ee) drop-shadow(0 0 12px #0ea5e9)"}}>
-                                        <path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="url(#neon-linear)"
+                                    <svg width="24" height="24" fill="none" className="dark:drop-shadow-[0_0_8px_#22d3ee]">
+                                        <path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="white" className="dark:stroke-[url(#neon-linear)]"
                                               strokeWidth={2}/>
                                         <defs>
                                             <linearGradient id="neon-linear" x1="4" y1="12" x2="18" y2="5"
@@ -478,12 +487,12 @@ export default function MascotFloating() {
                             </div>
                             {showSuggestions && activeSuggestions.length > 0 && (
                                 <div
-                                    className="flex flex-row gap-3 pt-2 pb-1 overflow-x-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-black/20">
+                                    className="flex flex-row gap-3 pt-2 pb-1 overflow-x-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-slate-200 dark:scrollbar-track-black/20">
                                     {activeSuggestions.map((sugg, i) => (
                                         <button
                                             key={i}
                                             type="button"
-                                            className="px-4 py-2 whitespace-nowrap rounded-full border-2 border-gradient-to-r from-purple-500 to-cyan-400 bg-black/60 text-white font-semibold text-sm shadow hover:bg-gradient-to-r hover:from-purple-600 hover:to-cyan-400 hover:text-white transition"
+                                            className="px-4 py-2 whitespace-nowrap rounded-full border-2 border-purple-400 dark:border-gradient-to-r dark:from-purple-500 dark:to-cyan-400 bg-white dark:bg-black/60 text-slate-900 dark:text-white font-semibold text-sm shadow hover:bg-purple-50 dark:hover:bg-gradient-to-r dark:hover:from-purple-600 dark:hover:to-cyan-400 transition"
                                             onClick={() => handleSuggestionClick(sugg)}
                                             disabled={typing}
                                         >
