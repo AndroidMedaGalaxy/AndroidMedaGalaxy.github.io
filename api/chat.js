@@ -5,18 +5,70 @@
 // Import secure server-side context (NEVER exposed to client)
 import {contextData} from './context.js';
 
-// Helper: Check if query is in scope
+// Helper: Log failed queries for analytics
+function logFailedQuery(query, reason) {
+  // Log to console for now - you can integrate with analytics service later
+  console.log('[ANALYTICS] Failed Query:', {
+    timestamp: new Date().toISOString(),
+    query: query,
+    reason: reason,
+    queryLength: query.length,
+    wordCount: query.split(/\s+/).length
+  });
+
+  // TODO: Integrate with analytics service (e.g., Google Analytics, Mixpanel, PostHog)
+  // Example:
+  // analytics.track('failed_query', {
+  //   query: query,
+  //   reason: reason
+  // });
+}
+
+// Helper: Check if query is in scope (LOOSENED)
 function isInScope(query) {
   const allowedDomains = [
-    'android', 'kotlin', 'compose', 'experience', 'project', 'cv', 'portfolio', 'skill', 'article', 'blog', 'medium', 'rituraj sambherao',
-      'about', 'summary', 'profile', 'company', 'companies', 'organization', 'organizations', 'organisation', 'organisations', 'open source', 'education', 'certifications',
-    'sap', 'toast', 'mastercard', 'nitor', 'corona-warn', 'digital aged', 'internationalization', 'payment gateway',
-    'interest', 'interests', 'hobby', 'hobbies', 'pc building', 'pc_building', 'gaming',
-    'motorcycle', 'bike', 'motorcycling', 'car', 'cars', 'motorhead', 'motorsport',
-    'dog', 'dog training', 'home automation', 'smart home'
+    // Core professional terms
+    'android', 'kotlin', 'compose', 'jetpack', 'java', 'mobile', 'app', 'developer', 'engineer', 'software',
+    'experience', 'project', 'cv', 'portfolio', 'skill', 'technology', 'tech', 'work', 'job', 'career',
+    'article', 'blog', 'medium', 'write', 'writing', 'post',
+
+    // Personal
+    'rituraj', 'sambherao', 'about', 'summary', 'profile', 'bio', 'who', 'what', 'where', 'when', 'why', 'how',
+
+    // Companies & Organizations
+    'company', 'companies', 'organization', 'organizations', 'organisation', 'organisations',
+    'sap', 'toast', 'mastercard', 'nitor', 'corona-warn', 'digital aged', 'client', 'employer',
+
+    // Technical skills
+    'kotlin', 'java', 'firebase', 'rest', 'api', 'graphql', 'compose', 'coroutine', 'flow',
+    'git', 'github', 'ci', 'cd', 'jenkins', 'agile', 'jira', 'test', 'tdd',
+    'internationalization', 'localization', 'payment', 'fintech', 'healthcare', 'ble', 'wearos',
+
+    // Education & Skills
+    'open source', 'education', 'certifications', 'certificate', 'degree', 'qualification', 'learn',
+
+    // Interests & Hobbies
+    'interest', 'interests', 'hobby', 'hobbies', 'passion', 'love', 'like', 'enjoy',
+    'pc building', 'pc_building', 'gaming', 'game', 'computer',
+    'motorcycle', 'bike', 'motorcycling', 'car', 'cars', 'motorhead', 'motorsport', 'ride', 'riding',
+    'dog', 'dog training', 'pet', 'puppy', 'training',
+    'home automation', 'smart home', 'automation', 'iot',
+
+    // General professional queries
+    'hire', 'hiring', 'contact', 'email', 'reach', 'connect', 'linkedin',
+    'recommend', 'advice', 'tell', 'show', 'describe', 'explain'
   ];
+
   const lower = query.toLowerCase();
-  return allowedDomains.some(keyword => lower.includes(keyword));
+
+  // Very permissive: if query contains any allowed keyword, it passes
+  const hasKeyword = allowedDomains.some(keyword => lower.includes(keyword));
+
+  // Also allow if query is reasonably sized (not spam)
+  const isReasonableLength = query.length >= 2 && query.length <= 500;
+
+  // Allow if either condition is met
+  return hasKeyword || (isReasonableLength && query.split(/\s+/).length >= 2);
 }
 
 // NEW: Helper – detect if a message is basically just a greeting / small talk opener
@@ -192,20 +244,27 @@ export default async function handler(req, res) {
 
     // Check scope server-side ONLY for non‑greeting messages
     if (!greeting && !isInScope(finalMessage)) {
+      logFailedQuery(finalMessage, 'out_of_scope');
       return res.status(200).json({
-        reply: "I'm here to answer questions about Rituraj Sambherao's professional work, experience, projects, or articles."
+        reply: "I'm specifically designed to answer questions about Rituraj Sambherao's professional profile. Please ask me about:\n\n• His work experience and companies he's worked for\n• Technical skills and technologies he uses\n• Projects he has built\n• His blog articles and writings\n• His interests and hobbies\n\nI won't be able to help with unrelated topics. What would you like to know about Rituraj's professional journey? 🚀",
+        queryFailed: true,
+        failureReason: 'out_of_scope'
       });
     }
 
     // Retrieve context SERVER-SIDE using secure context data for non‑greeting, in‑scope queries
     let contextSnippet = '';
+    let hasMinimalContext = false;
+
     if (!greeting) {
       contextSnippet = retrieveRelevantContext(contextData, finalMessage);
 
+      // LOOSENED: If context is minimal, still allow but log it for analytics
       if (!contextSnippet || contextSnippet.length < 10) {
-        return res.status(200).json({
-          reply: "I can only answer questions related to Rituraj Sambherao's experience, projects, and articles."
-        });
+        logFailedQuery(finalMessage, 'no_context_found');
+        hasMinimalContext = true;
+        // Instead of rejecting, provide a generic context about Rituraj
+        contextSnippet = `Rituraj Sambherao is a Senior Android Engineer with extensive experience in Kotlin, Jetpack Compose, and mobile development. He has worked at companies like Toast, Mastercard, SAP, and Nitor Infotech, building fintech and healthcare applications.`;
       }
     }
 
@@ -221,7 +280,9 @@ export default async function handler(req, res) {
 
 For greetings: Respond warmly and naturally. Introduce yourself briefly as Rituraj's assistant and invite them to ask about his work, projects, skills, or interests. You may occasionally mention something contextual like time of day or weather to feel personable, but keep it brief and varied—not every time.
 
-For questions: Answer ONLY using the provided context about Rituraj's experience, projects, skills, interests, and blog summaries. When a query matches a context entry, provide the full relevant content. Be concise, clear, and professional.
+For questions: Answer using the provided context about Rituraj's experience, projects, skills, interests, and blog summaries. When a query matches a context entry, provide the full relevant content. If the context is minimal or doesn't fully answer the question, acknowledge what you know and politely suggest they ask about specific areas like his work experience, projects, skills, or interests. Be concise, clear, and professional.
+
+Important: Stay focused on Rituraj Sambherao and his professional profile. If asked about something completely unrelated (politics, religion, etc.), politely redirect to his professional work.
 
 Style: Use up to 2 appropriate emojis per response (for clarity or personality), but it's fine to use none. Format with paragraphs separated by ONE empty line for readability. Avoid em dashes. Keep responses conversational but professional.`;
 
@@ -238,8 +299,12 @@ Style: Use up to 2 appropriate emojis per response (for clarity or personality),
       }
       messages.push({ role: 'user', content: finalMessage });
     } else {
+      // Include a note if context is minimal
+      const contextNote = hasMinimalContext
+        ? '\n\n[Note: Limited specific context available for this query. Provide what you know and guide them to ask about specific areas.]'
+        : '';
       messages.push(
-        { role: 'user', content: `Context:\n${contextSnippet}` },
+        { role: 'user', content: `Context:\n${contextSnippet}${contextNote}` },
         { role: 'user', content: finalMessage }
       );
     }
@@ -269,8 +334,16 @@ Style: Use up to 2 appropriate emojis per response (for clarity or personality),
     const data = await openAIResponse.json();
     const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't find an answer.";
 
-    // Return the response
-    return res.status(200).json({ reply });
+    // Return the response with metadata about query success/failure
+    const response = { reply };
+
+    // If we had minimal context, mark this as a partial failure for analytics
+    if (hasMinimalContext) {
+      response.queryFailed = true;
+      response.failureReason = 'no_context_found';
+    }
+
+    return res.status(200).json(response);
 
   } catch (error) {
     console.error('Error in chat handler:', error);

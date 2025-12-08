@@ -2,6 +2,29 @@
 // CLIENT-SIDE utility for chat interactions
 // NO sensitive data or API keys here - all handled by /api/chat serverless function
 
+import { trackChatQuery, trackFailedQuery } from './firebase.js';
+
+// Analytics helper - track user queries using Firebase
+function trackQuery(query, status, response = null) {
+    try {
+        const responseLength = response ? response.length : 0;
+
+        // Log to console for debugging
+        console.log('[Client Analytics] Query:', {
+            timestamp: new Date().toISOString(),
+            query: query,
+            status: status,
+            responseLength: responseLength
+        });
+
+        // Track with Firebase Analytics
+        trackChatQuery(query, status, responseLength);
+    } catch (error) {
+        console.error('Analytics tracking error:', error);
+    }
+}
+
+
 // Suggested query prompts for quick access
 export function getSuggestedQueries() {
     return [
@@ -21,8 +44,12 @@ export function getSuggestedQueries() {
 // Main function to send message to secure serverless API
 // All context retrieval and OpenAI calls happen server-side
 export async function generateResponseOpenAI({userMessage}) {
+    // Track the query
+    trackQuery(userMessage, 'initiated');
+
     // CV trigger: Recognize requests for CV, resume, download CV
     if (/download cv|cv|resume/i.test(userMessage)) {
+        trackQuery(userMessage, 'cv_download');
         return "<<DOWNLOAD_CV>>";
     }
 
@@ -77,13 +104,29 @@ export async function generateResponseOpenAI({userMessage}) {
 
         try {
             const data = await resp.json();
-            return data.reply || "Sorry, I couldn't find an answer.";
+            const reply = data.reply || "Sorry, I couldn't find an answer.";
+
+            // Check if server indicated this query failed
+            if (data.queryFailed && data.failureReason) {
+                trackFailedQuery(userMessage, data.failureReason);
+                console.log('[Analytics] Failed query tracked:', {
+                    query: userMessage,
+                    reason: data.failureReason
+                });
+            } else {
+                // Track successful response
+                trackQuery(userMessage, 'success', reply);
+            }
+
+            return reply;
         } catch (e) {
             console.error("Error parsing assistant service JSON:", e);
+            trackQuery(userMessage, 'error_parsing');
             return "Sorry, there was an error processing the assistant's response.";
         }
     } catch (error) {
         console.error("Network or fetch error:", error);
+        trackQuery(userMessage, 'error_network');
         return "Sorry, there was an error contacting the assistant.";
     }
 }
