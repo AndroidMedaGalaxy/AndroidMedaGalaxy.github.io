@@ -24,51 +24,84 @@ function logFailedQuery(query, reason) {
   // });
 }
 
-// Helper: Check if query is in scope (LOOSENED)
+// Helper: Check if query is in scope
 function isInScope(query) {
-  const allowedDomains = [
+  const lower = query.toLowerCase();
+
+  // First, check for spam/harmful content patterns
+  const spamPatterns = [
+    // Math/calculation indicators
+    /\d+\s*[+\-*/×÷]\s*\d+/,  // Math operations: 2+2, 5*3
+    /how much|how many|calculate|distance|speed|time|hours|minutes|seconds/i,
+    /\bkmph\b|\bkm\/h\b|\bmph\b|\bmiles\b|\bkilometer/i,
+
+    // Generic questions (not about professional profile)
+    /\b(what is|what's|whats|define|meaning of|explain)\s+(the|a|an)?\s*\w+\s*(formula|equation|theory|concept|definition)/i,
+    /\bweather\b|\bjoke\b|\bstory\b|\brecipe\b|\bcook/i,
+    /\belection\b|\bpresident\b|\bpolitics\b|\breligion\b/i,
+
+    // Harmful/inappropriate
+    /\b(fuck|shit|damn|hell|bitch|asshole|bastard)\b/i,
+    /\b(kill|murder|suicide|bomb|terror|attack)\b/i,
+    /\b(hack|crack|steal|pirate|illegal)\b/i,
+  ];
+
+  // Reject if matches spam patterns
+  if (spamPatterns.some(pattern => pattern.test(query))) {
+    return false;
+  }
+
+  // Professional domain keywords (must match at least one)
+  const professionalKeywords = [
     // Core professional terms
     'android', 'kotlin', 'compose', 'jetpack', 'java', 'mobile', 'app', 'developer', 'engineer', 'software',
     'experience', 'project', 'cv', 'portfolio', 'skill', 'technology', 'tech', 'work', 'job', 'career',
     'article', 'blog', 'medium', 'write', 'writing', 'post',
 
-    // Personal
-    'rituraj', 'sambherao', 'about', 'summary', 'profile', 'bio', 'who', 'what', 'where', 'when', 'why', 'how',
-
-    // Companies & Organizations
-    'company', 'companies', 'organization', 'organizations', 'organisation', 'organisations',
-    'sap', 'toast', 'mastercard', 'nitor', 'corona-warn', 'digital aged', 'client', 'employer',
+    // Companies
+    'sap', 'toast', 'mastercard', 'nitor', 'corona-warn', 'digital aged', 'company', 'companies',
 
     // Technical skills
-    'kotlin', 'java', 'firebase', 'rest', 'api', 'graphql', 'compose', 'coroutine', 'flow',
+    'firebase', 'rest', 'api', 'graphql', 'coroutine', 'flow',
     'git', 'github', 'ci', 'cd', 'jenkins', 'agile', 'jira', 'test', 'tdd',
     'internationalization', 'localization', 'payment', 'fintech', 'healthcare', 'ble', 'wearos',
 
-    // Education & Skills
-    'open source', 'education', 'certifications', 'certificate', 'degree', 'qualification', 'learn',
+    // Education
+    'education', 'certifications', 'certificate', 'degree', 'qualification',
 
-    // Interests & Hobbies
-    'interest', 'interests', 'hobby', 'hobbies', 'passion', 'love', 'like', 'enjoy',
-    'pc building', 'pc_building', 'gaming', 'game', 'computer',
-    'motorcycle', 'bike', 'motorcycling', 'car', 'cars', 'motorhead', 'motorsport', 'ride', 'riding',
-    'dog', 'dog training', 'pet', 'puppy', 'training',
-    'home automation', 'smart home', 'automation', 'iot',
+    // Professional interests (specific to Rituraj's profile)
+    'pc building', 'pc_building', 'gaming setup', 'home automation', 'smart home',
+    'dog training', 'motorcycle riding', 'motorcycling',
 
-    // General professional queries
-    'hire', 'hiring', 'contact', 'email', 'reach', 'connect', 'linkedin',
-    'recommend', 'advice', 'tell', 'show', 'describe', 'explain'
+    // Professional queries
+    'hire', 'hiring', 'contact', 'email', 'reach', 'connect', 'linkedin'
   ];
 
-  const lower = query.toLowerCase();
+  // Profile-specific keywords (can be combined with professional keywords)
+  const profileKeywords = ['rituraj', 'sambherao', 'about', 'summary', 'profile', 'bio'];
 
-  // Very permissive: if query contains any allowed keyword, it passes
-  const hasKeyword = allowedDomains.some(keyword => lower.includes(keyword));
+  // Check if query is about Rituraj's professional profile
+  const hasProfessionalKeyword = professionalKeywords.some(keyword => lower.includes(keyword));
+  const hasProfileKeyword = profileKeywords.some(keyword => lower.includes(keyword));
 
-  // Also allow if query is reasonably sized (not spam)
-  const isReasonableLength = query.length >= 2 && query.length <= 500;
+  // Special handling for "about" queries - these are OK
+  if (lower.match(/^(about|who is|tell me about|show me|what about)\s+(rituraj|sambherao)/i)) {
+    return true;
+  }
 
-  // Allow if either condition is met
-  return hasKeyword || (isReasonableLength && query.split(/\s+/).length >= 2);
+  // Query must have at least one professional keyword
+  // OR be asking about Rituraj's profile/bio/summary specifically
+  if (hasProfessionalKeyword) {
+    return true;
+  }
+
+  // If only mentions Rituraj but no professional context, reject it
+  // (This catches "If Rituraj rides a bike at 60kmph..." type questions)
+  if (hasProfileKeyword && !hasProfessionalKeyword) {
+    return false;
+  }
+
+  return false;
 }
 
 // NEW: Helper – detect if a message is basically just a greeting / small talk opener
